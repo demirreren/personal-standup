@@ -1,0 +1,28 @@
+# Ruby / Rails
+backend/log/*
+backend/tmp/*
+backend/storage/*
+backend/.bundle
+backend/vendor/bundle
+backend/db/*.sqlite3
+backend/db/*.sqlite3-*
+backend/config/master.key
+backend/config/credentials.yml.enc
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/
