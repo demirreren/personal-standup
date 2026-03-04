@@ -7,6 +7,7 @@ import Today from "./pages/Today";
 import History from "./pages/History";
 import Weekly from "./pages/Weekly";
 import Dashboard from "./pages/Dashboard";
+import SharedDigest from "./pages/SharedDigest";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/weekly" element={<Weekly />} />
           </Route>
+          <Route path="/shared/:token" element={<SharedDigest />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>
