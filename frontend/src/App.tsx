@@ -7,10 +7,14 @@ import Dashboard from "./pages/Dashboard";
 import Weekly from "./pages/Weekly";
 import SharedDigest from "./pages/SharedDigest";
 import BlobCursor from "./components/BlobCursor";
+import DarkVeil from "./components/DarkVeil";
 
 export default function App() {
   return (
     <BrowserRouter>
+      <div className="darkveil-bg">
+        <DarkVeil speed={0.4} hueShift={0} warpAmount={0.4} noiseIntensity={0.015} />
+      </div>
       <BlobCursor />
       <AuthProvider>
         <Routes>

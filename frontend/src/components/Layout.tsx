@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LogOut, LogIn, Sun, BarChart3, Clock, Share2, ArrowRight } from "lucide-react";
+import { LogOut, LogIn, Sun, BarChart3, Clock, Share2 } from "lucide-react";
 import AuthModal from "./AuthModal";
+import SplitText from "./SplitText";
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Ready to plan your day?";
+  if (hour < 17) return "How's the day going?";
+  return "Time to reflect.";
+}
 
 export default function Layout() {
   const { user, logout, loading } = useAuth();
@@ -16,7 +24,6 @@ export default function Layout() {
   };
 
   const openLogin = () => { setAuthMode("login"); setAuthOpen(true); };
-  const openRegister = () => { setAuthMode("register"); setAuthOpen(true); };
 
   if (loading) return <div className="page-loading">Loading...</div>;
 
@@ -24,7 +31,27 @@ export default function Layout() {
     <div className="app">
       <nav className="sidebar">
         <div className="sidebar-header">
-          <span className="logo-dot">.</span>
+          <div className="logo-mark">
+            <svg className="logo-icon-svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
+              {/* Ball — always visible */}
+              <circle cx="10" cy="26.5" r="3.5" fill="var(--primary)" />
+              {/* Figure — fades on hover */}
+              <g className="logo-figure-group" stroke="var(--primary)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+                {/* Head */}
+                <circle cx="19" cy="4.5" r="3.5" fill="var(--primary)" stroke="none" />
+                {/* Torso */}
+                <path d="M 19 8 L 17 21" />
+                {/* Front arm — bent at elbow, forearm up */}
+                <path d="M 19 12 L 14 14 L 13 9" />
+                {/* Back arm — swinging behind */}
+                <path d="M 19 12 L 23 18" />
+                {/* Front leg — high knee raise */}
+                <path d="M 17 21 L 10 17 L 10 23" />
+                {/* Back leg — trailing */}
+                <path d="M 17 21 L 21 28" />
+              </g>
+            </svg>
+          </div>
           <h1 className="logo">standup</h1>
         </div>
 
@@ -70,22 +97,23 @@ export default function Layout() {
         {user ? (
           <Outlet />
         ) : (
-          <div className="welcome-hero">
-            <h1 className="welcome-title">
-              Know what you shipped.<br />
-              <span className="hero-gradient">Not just what kept you busy.</span>
-            </h1>
-            <p className="welcome-subtitle">
-              Two check-ins a day. Thirty seconds each.<br />
-              Your morning plan versus your evening reality.
-            </p>
-            <div className="welcome-ctas">
-              <button onClick={openRegister} className="btn-primary btn-lg">
-                Get started <ArrowRight size={18} />
-              </button>
-              <button onClick={openLogin} className="btn-ghost">
-                Sign in
-              </button>
+          <div className="welcome-screen">
+            <div className="welcome-text-overlay">
+              <SplitText
+                text={getGreeting()}
+                tag="h1"
+                className="welcome-greeting"
+                delay={40}
+                duration={1.25}
+                ease="power3.out"
+                splitType="chars"
+                from={{ opacity: 0, y: 40 }}
+                to={{ opacity: 1, y: 0 }}
+                threshold={0.1}
+                rootMargin="0px"
+                textAlign="center"
+              />
+              <p className="welcome-hint">sign in to start your standup</p>
             </div>
           </div>
         )}
