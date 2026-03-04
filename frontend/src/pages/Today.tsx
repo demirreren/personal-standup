@@ -5,10 +5,11 @@ import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
 import { api, type Checkin, type DailySummary } from "../lib/api";
 import {
-  Sun, Moon, Send, Check, Sparkles, Loader,
+  Sun, Moon, Send, Check, Zap, Loader, Sparkles,
   ArrowRight, RotateCcw, X,
 } from "lucide-react";
 import MetaBalls from "../components/MetaBalls";
+import StarBorder from "../components/StarBorder";
 
 const LAYOUT_SPRING = { type: "spring" as const, stiffness: 75, damping: 18, mass: 1.1 };
 
@@ -525,7 +526,9 @@ export default function Today() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
                   >
-                    <Sparkles size={14} className="nudge-icon" />
+                    <div className="nudge-icon-badge">
+                      <Zap size={15} />
+                    </div>
                     <p>{nudge}</p>
                     <button className="nudge-dismiss" onClick={() => setNudge(null)}>
                       <X size={12} />
@@ -537,44 +540,65 @@ export default function Today() {
               {(morning || evening) && !nudge && (
                 <motion.div
                   className="summary-section"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.6 }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.4 }}
                 >
-                  {summary ? (
-                    <div className="summary-card">
-                      <div className="summary-header">
-                        <Sparkles size={18} />
-                        <h3>AI Insight</h3>
-                      </div>
-                      <p className="summary-text">{summary.ai_summary}</p>
-                      {summary.carry_overs && (
-                        <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <button
-                      className="btn-ghost generate-btn"
-                      onClick={async () => {
-                        setGeneratingSummary(true);
-                        try {
-                          const { daily_summary } = await api.summaries.generate();
-                          setSummary(daily_summary);
-                          if (daily_summary.ai_summary) {
-                            setNudge(daily_summary.ai_summary);
-                          }
-                        } catch (err: unknown) {
-                          alert((err as Error).message);
-                        } finally {
-                          setGeneratingSummary(false);
-                        }
-                      }}
-                      disabled={generatingSummary}
-                    >
-                      {generatingSummary ? <Loader size={14} className="spin" /> : <Sparkles size={14} />}
-                      {generatingSummary ? "Generating..." : "Generate AI insight"}
-                    </button>
-                  )}
+                  <AnimatePresence mode="wait">
+                    {summary ? (
+                      <motion.div
+                        key="summary-card"
+                        className="summary-card"
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                      >
+                        <div className="summary-header">
+                          <Zap size={18} />
+                          <h3>Today's Read</h3>
+                        </div>
+                        <p className="summary-text">{summary.ai_summary}</p>
+                        {summary.carry_overs && (
+                          <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
+                        )}
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="generate-pill"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.88 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <StarBorder
+                          as="button"
+                          className="generate-star-btn"
+                          color="#5b9cf6"
+                          speed="5s"
+                          onClick={async () => {
+                            setGeneratingSummary(true);
+                            try {
+                              const { daily_summary } = await api.summaries.generate();
+                              setSummary(daily_summary);
+                              if (daily_summary.ai_summary) {
+                                setNudge(daily_summary.ai_summary);
+                              }
+                            } catch (err: unknown) {
+                              alert((err as Error).message);
+                            } finally {
+                              setGeneratingSummary(false);
+                            }
+                          }}
+                          disabled={generatingSummary}
+                        >
+                          {generatingSummary
+                            ? <Loader size={13} className="spin" />
+                            : <Sparkles size={13} />}
+                          {generatingSummary ? "Generating…" : "Get today's read"}
+                        </StarBorder>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               )}
             </>

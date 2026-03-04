@@ -29,7 +29,7 @@ module Api
           return
         end
 
-        summary = AiService.generate_daily_summary(checkins)
+        summary = AiService.generate_daily_summary(checkins, current_user.name)
         daily_summary = current_user.daily_summaries.find_or_initialize_by(date: date)
         daily_summary.assign_attributes(summary)
 

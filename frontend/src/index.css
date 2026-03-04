@@ -666,35 +666,54 @@ a, button, input, textarea, select, [role="button"] {
 /* ============ AI SUMMARY ============ */
 .summary-section {
   margin-top: 24px;
-  animation: fadeUp 0.4s ease 0.25s backwards;
   width: 100%;
   max-width: 1100px;
   padding: 0 40px;
   box-sizing: border-box;
   position: relative;
   z-index: 1;
-}
-
-.generate-btn {
-  width: 100%;
+  display: flex;
   justify-content: center;
-  padding: 16px;
-  border-style: dashed;
-  border-color: var(--border-hover);
 }
 
-.generate-btn:hover {
-  border-color: var(--primary);
+/* StarBorder generate button */
+.generate-star-btn {
+  cursor: pointer;
+  font-family: inherit;
+  background: transparent;
+  border: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.generate-star-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.generate-star-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.generate-star-btn .inner-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--primary);
-  background: var(--primary-soft);
+  background: rgba(10, 13, 20, 0.9);
+  border-color: rgba(91, 156, 246, 0.15);
+  border-radius: 20px;
+  font-family: inherit;
 }
 
 .summary-card {
+  width: 100%;
   background: linear-gradient(135deg, var(--bg-card) 0%, rgba(59, 130, 246, 0.04) 100%);
   border: 1px solid rgba(59, 130, 246, 0.15);
   border-radius: var(--radius);
   padding: 22px;
-  animation: fadeUp 0.4s ease;
   box-shadow: var(--shadow-glow);
 }
 
@@ -840,19 +859,42 @@ a, button, input, textarea, select, [role="button"] {
 .standup-input {
   width: 100%;
   padding: 10px 14px;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: var(--radius-sm);
   color: var(--text);
   font-size: 13px;
   font-family: inherit;
   outline: none;
-  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.standup-input:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.11);
 }
 
 .standup-input:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px var(--primary-soft);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(91, 156, 246, 0.4);
+  box-shadow: 0 0 0 3px rgba(91, 156, 246, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Card-specific focus colors */
+.morning-card .standup-input:focus {
+  border-color: rgba(245, 158, 11, 0.45);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.evening-card .standup-input:focus {
+  border-color: rgba(139, 92, 246, 0.45);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08),
+              inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .standup-input::placeholder {
@@ -867,31 +909,32 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .standup-field {
-  padding: 6px 0;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 10px;
+  margin-bottom: 6px;
 }
 
 .standup-field-label {
   display: block;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 3px;
+  letter-spacing: 0.7px;
+  margin-bottom: 4px;
 }
 
 .standup-field p {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--text-secondary);
   line-height: 1.6;
 }
 
 .blocker-field {
-  padding: 8px 12px;
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.12);
-  border-radius: var(--radius-sm);
-  margin-top: 4px;
+  background: rgba(245, 158, 11, 0.05);
+  border-color: rgba(245, 158, 11, 0.14);
 }
 
 .blocker-field .standup-field-label {
@@ -901,31 +944,40 @@ a, button, input, textarea, select, [role="button"] {
 /* ============ AI NUDGE ============ */
 .ai-nudge {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 14px;
   margin-top: 20px;
-  padding: 14px 40px;
+  padding: 16px 18px;
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
   border: 1px solid rgba(59, 130, 246, 0.12);
   border-radius: var(--radius);
   width: 100%;
   max-width: 1100px;
   box-sizing: border-box;
-  animation: fadeUp 0.4s ease;
   position: relative;
   z-index: 1;
 }
 
-.nudge-icon {
-  color: var(--primary);
+.nudge-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  background: rgba(91, 156, 246, 0.12);
+  border: 1px solid rgba(91, 156, 246, 0.18);
+  border-radius: 8px;
+  color: var(--primary);
+  margin-top: 1px;
 }
 
 .ai-nudge p {
   font-size: 13px;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
   flex: 1;
+  padding-top: 6px;
 }
 
 .nudge-dismiss {
@@ -933,6 +985,7 @@ a, button, input, textarea, select, [role="button"] {
   height: 24px;
   border-radius: 50%;
   background: transparent;
+  margin-top: 3px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
@@ -2086,7 +2139,6 @@ a, button, input, textarea, select, [role="button"] {
   inset: -22px -10px;
   background: rgba(12, 15, 24, 0.52);
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
   z-index: 0;
   pointer-events: none;
 }
@@ -2135,15 +2187,11 @@ a, button, input, textarea, select, [role="button"] {
 
 /* ---- Morning / Evening accent glow on the card shell ---- */
 .standup-flip-card.morning-card .standup-flip-card-inner {
-  box-shadow:
-    0 20px 64px rgba(245, 158, 11, 0.14),
-    0 0 0 1px rgba(245, 158, 11, 0.1);
+  box-shadow: 0 20px 64px rgba(245, 158, 11, 0.14);
 }
 
 .standup-flip-card.evening-card .standup-flip-card-inner {
-  box-shadow:
-    0 20px 64px rgba(139, 92, 246, 0.14),
-    0 0 0 1px rgba(139, 92, 246, 0.1);
+  box-shadow: 0 20px 64px rgba(139, 92, 246, 0.14);
 }
 
 /* ---- MetaBalls connector between the two cards ---- */
@@ -2186,17 +2234,20 @@ a, button, input, textarea, select, [role="button"] {
 .standup-flip-card-front {
   background-size: cover;
   background-position: center;
-  filter: grayscale(30%) brightness(0.82);
+  filter: grayscale(15%) brightness(0.78) saturate(1.1);
+  transition: filter 0.3s ease;
+}
+
+.standup-flip-card:hover .standup-flip-card-front {
+  filter: grayscale(5%) brightness(0.86) saturate(1.2);
 }
 
 .standup-flip-card-front.morning {
   background-image: url('/morning.jpg');
-  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.18);
 }
 
 .standup-flip-card-front.evening {
   background-image: url('/evening.jpg');
-  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.18);
 }
 
 .flip-card-overlay {
@@ -2287,23 +2338,79 @@ a, button, input, textarea, select, [role="button"] {
 /* Back face */
 .standup-flip-card-back {
   transform: rotateY(180deg);
-  background: rgba(10, 13, 20, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(
+    175deg,
+    rgba(16, 20, 32, 0.96) 0%,
+    rgba(8, 11, 18, 0.98) 100%
+  );
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  /* gradient border: bright top edge fades to barely-there bottom */
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  outline: 1px solid rgba(255, 255, 255, 0.055);
+  outline-offset: -1px;
   display: flex;
   flex-direction: column;
   padding: 22px 24px;
   gap: 0;
-  box-shadow: var(--shadow-card);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Colored ambient bleed at the top of the back face */
+.standup-flip-card-back::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 160px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.morning-card .standup-flip-card-back::before {
+  background: radial-gradient(
+    ellipse 80% 80px at 25% 0%,
+    rgba(245, 158, 11, 0.11) 0%,
+    transparent 100%
+  );
+}
+
+.evening-card .standup-flip-card-back::before {
+  background: radial-gradient(
+    ellipse 80% 80px at 75% 0%,
+    rgba(139, 92, 246, 0.12) 0%,
+    transparent 100%
+  );
+}
+
+/* Push all back-face content above the pseudo-element */
+.flip-back-header,
+.standup-flip-card-back .checkin-form,
+.standup-flip-card-back .checkin-content {
+  position: relative;
+  z-index: 1;
 }
 
 .flip-back-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  padding-bottom: 14px;
+  margin-bottom: 14px;
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.morning-card .flip-back-header {
+  border-bottom-color: rgba(245, 158, 11, 0.14);
+}
+
+.evening-card .flip-back-header {
+  border-bottom-color: rgba(139, 92, 246, 0.14);
 }
 
 .flip-back-header h3 {

@@ -5,12 +5,12 @@ class AiService
   API_URL = "https://api.openai.com/v1/chat/completions"
   MODEL = "gpt-4o-mini"
 
-  def self.generate_daily_summary(checkins)
+  def self.generate_daily_summary(checkins, name = nil)
     morning = checkins.find { |c| c.morning? }
     evening = checkins.find { |c| c.evening? }
 
-    prompt = build_daily_prompt(morning, evening)
-    response = chat(prompt, system: "You are a perceptive personal coach. You spot patterns and blind spots. Respond in JSON only.")
+    prompt = build_daily_prompt(morning, evening, name)
+    response = chat(prompt, system: "You are a blunt, slightly quirky personal coach talking directly to #{name || 'the user'}. Be honest and specific, talk in second person (you/your), and let your personality show — use things like :) or a dry joke when it fits. No fluff, no generic praise, no em dashes. Respond in JSON only.")
 
     parsed = JSON.parse(response)
     {
@@ -37,7 +37,8 @@ class AiService
     return nil if recent_checkins.size < 3
 
     prompt = build_nudge_prompt(recent_checkins, current_checkin)
-    response = chat(prompt, system: "You are a pattern-spotting AI for a personal standup app. Be concise, insightful, and non-judgmental. Respond in JSON only.")
+    name = user.name
+    response = chat(prompt, system: "You are a blunt, slightly quirky coach talking to #{name}. Speak in second person (you/your), be specific and honest, and let your personality show with things like :) or a dry observation. No sugarcoating, no generic advice, no em dashes. Respond in JSON only.")
 
     parsed = JSON.parse(response)
     nudge_text = parsed["nudge"]
@@ -48,7 +49,7 @@ class AiService
 
   def self.generate_weekly_digest(checkins, summaries)
     prompt = build_weekly_prompt(checkins, summaries)
-    response = chat(prompt, system: "You are a thoughtful personal coach who spots patterns across work and life. Respond in JSON only.")
+    response = chat(prompt, system: "You are a blunt, slightly quirky coach recapping someone's week. Talk directly to them in second person (you/your), be specific, and let personality show with things like :) or dry humor. No sugarcoating, no em dashes. Respond in JSON only.")
 
     parsed = JSON.parse(response)
     feelings = checkins.filter_map(&:feeling)
@@ -77,7 +78,8 @@ class AiService
 
   private
 
-  def self.build_daily_prompt(morning, evening)
+  def self.build_daily_prompt(morning, evening, name = nil)
+    person = name || "this person"
     parts = []
     if morning
       parts << "Morning standup (feeling: #{morning.feeling || 'not set'}/100):"
@@ -92,11 +94,11 @@ class AiService
     end
 
     <<~PROMPT
-      Analyze this person's daily standup and return a JSON object with:
-      - "insight": A 1-2 sentence observation about their day. Don't just summarize — notice something useful: a gap between plan and reality, a pattern, a win worth acknowledging, or a blocker that needs attention. Be specific.
-      - "tasks_planned": estimated number of things they mentioned planning (integer)
-      - "tasks_completed": estimated number they completed based on evening check-in (integer)
-      - "carry_overs": a brief note on what didn't get done, or null if everything was completed
+      Here is #{person}'s standup for today. Return a JSON object with:
+      - "insight": 1-2 sentences addressed directly to them (use "you"/"your"). Don't summarize — call out something real: a gap between their plan and reality, a pattern, a win, or a blocker that's getting in their way. Be blunt and specific.
+      - "tasks_planned": estimated number of tasks they planned (integer)
+      - "tasks_completed": estimated number completed based on evening check-in (integer)
+      - "carry_overs": brief note on what didn't get done, or null if everything was completed
 
       #{parts.join("\n")}
     PROMPT
@@ -127,16 +129,16 @@ class AiService
     end
 
     <<~PROMPT
-      You're a pattern-spotting AI. Below is a user's recent standup history (last 2 weeks) and what they just checked in with today.
+      Here's #{user.name}'s standup history for the last 2 weeks and their check-in today. Spot a NON-OBVIOUS pattern and call it out directly.
 
-      Your job: look for a NON-OBVIOUS pattern, insight, or nudge. Return a JSON object with:
-      - "nudge": A single concise sentence (max 25 words). This should surface something the user likely hasn't noticed — recurring blockers, feeling trends, forgotten goals, day-of-week patterns, plan-vs-reality gaps. If there's nothing genuinely worth noting, return "nudge": null.
+      Return a JSON object with:
+      - "nudge": One blunt sentence (max 25 words) addressed directly to them using "you". Surface something they likely haven't noticed — recurring blockers, feeling trends, forgotten goals, day-of-week dips, plan-vs-reality gaps. If there's genuinely nothing worth saying, return "nudge": null.
 
       Rules:
-      - Don't summarize what they just said. They already know that.
-      - Don't be generic ("Great job!" or "Keep it up!"). Be specific.
-      - Reference actual data from their history.
-      - This covers work AND personal life (gym, health, personal goals are all fair game).
+      - Don't echo what they just said. They know what they wrote.
+      - No cheerleading. No "Great job!" Be specific and direct.
+      - Reference real data from their history.
+      - Work AND personal life are fair game.
 
       Recent history:
       #{history.join("\n")}
@@ -169,11 +171,13 @@ class AiService
     end
 
     <<~PROMPT
-      Analyze this person's week of personal standups (covering work AND personal life) and return a JSON object with:
-      - "digest": A 3-4 sentence narrative of their week. Focus on the arc: what they were trying to do, how it actually went, and what shifted. Note plan-vs-reality gaps and feeling trends.
-      - "wins": Top 3 accomplishments across work and personal life (as a bulleted string)
-      - "patterns": Notable patterns — feeling trends by day-of-week, recurring behaviors, productivity patterns, personal goal consistency. Be specific with data.
-      - "blocker_patterns": Recurring blockers or things they keep avoiding/carrying over. null if none.
+      Here's someone's week of standups. Write everything addressed directly to them using "you"/"your". Be honest and specific — no fluff.
+
+      Return a JSON object with:
+      - "digest": 3-4 sentences narrating their week directly to them. Cover what they set out to do, how it actually went, and what shifted. Call out plan-vs-reality gaps and energy trends.
+      - "wins": Top 3 real accomplishments from work and personal life (as a bulleted string)
+      - "patterns": Notable patterns — energy by day-of-week, recurring behaviors, productivity trends. Be specific, use their actual data.
+      - "blocker_patterns": Recurring blockers or things they kept avoiding/carrying over. null if none.
 
       #{days.join("\n")}
     PROMPT
@@ -212,7 +216,8 @@ class AiService
       return fallback_response(prompt)
     end
 
-    body.dig("choices", 0, "message", "content")&.strip
+    raw = body.dig("choices", 0, "message", "content")&.strip
+    raw&.gsub(/\A```(?:json)?\s*/, "")&.gsub(/\s*```\z/, "")
   end
 
   def self.fallback_response(prompt)
