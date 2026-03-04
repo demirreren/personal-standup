@@ -1,0 +1,62 @@
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import Aurora from "../components/Aurora";
+import BentoGrid from "../components/BentoGrid";
+
+export default function Landing() {
+  return (
+    <div className="landing">
+      <div className="aurora-bg">
+        <Aurora
+          colorStops={["#3b82f6", "#7c3aed", "#3b82f6"]}
+          blend={0.6}
+          amplitude={1.2}
+          speed={0.5}
+        />
+      </div>
+
+      <nav className="landing-nav">
+        <div className="landing-nav-inner">
+          <h1 className="logo">standup<span className="logo-dot">.</span></h1>
+          <div className="landing-nav-links">
+            <Link to="/login" className="btn-ghost">Sign in</Link>
+            <Link to="/register" className="btn-primary">Get started <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+      </nav>
+
+      <section className="hero">
+        <h1 className="hero-title">
+          Know what you shipped.<br />
+          <span className="hero-gradient">Not just what kept you busy.</span>
+        </h1>
+        <p className="hero-subtitle">
+          Two check-ins a day. Thirty seconds each.<br />
+          Your morning plan versus your evening reality.<br />
+          That gap is where the growth happens.
+        </p>
+        <div className="hero-ctas">
+          <Link to="/register" className="btn-primary btn-lg">
+            Start your first standup <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      <section className="bento-section">
+        <BentoGrid />
+      </section>
+
+      <section className="cta-section">
+        <h2>Stop wondering where the day went.</h2>
+        <p>For freelancers, indie hackers, remote workers, and anyone doing self-directed work.</p>
+        <Link to="/register" className="btn-primary btn-lg">
+          Get started, it's free <ArrowRight size={18} />
+        </Link>
+      </section>
+
+      <footer className="landing-footer">
+        <p>built by <a href="https://github.com/demirreren" target="_blank" rel="noopener noreferrer">demir</a></p>
+      </footer>
+    </div>
+  );
+}
