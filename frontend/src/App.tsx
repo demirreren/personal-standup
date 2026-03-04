@@ -6,6 +6,7 @@ import Register from "./pages/Register";
 import Today from "./pages/Today";
 import History from "./pages/History";
 import Weekly from "./pages/Weekly";
+import Dashboard from "./pages/Dashboard";
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -31,6 +32,7 @@ export default function App() {
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<Today />} />
             <Route path="/history" element={<History />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/weekly" element={<Weekly />} />
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
