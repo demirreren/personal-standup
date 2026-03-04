@@ -15,6 +15,11 @@ Rails.application.routes.draw do
 
       get "weekly_digests", to: "weekly_digests#index"
       post "weekly_digests/generate", to: "weekly_digests#generate"
+
+      get "dashboard/stats", to: "dashboard#stats"
+      get "dashboard/trends", to: "dashboard#trends"
+
+      get "public/weekly/:share_token", to: "public#weekly_digest"
     end
   end
 end
