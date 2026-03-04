@@ -1,9 +1,16 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Aurora from "../components/Aurora";
 import BentoGrid from "../components/BentoGrid";
+import AuthModal from "../components/AuthModal";
 
 export default function Landing() {
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "register">("login");
+
+  const openLogin = () => { setAuthMode("login"); setAuthOpen(true); };
+  const openRegister = () => { setAuthMode("register"); setAuthOpen(true); };
+
   return (
     <div className="landing">
       <div className="aurora-bg">
@@ -19,8 +26,8 @@ export default function Landing() {
         <div className="landing-nav-inner">
           <h1 className="logo">standup<span className="logo-dot">.</span></h1>
           <div className="landing-nav-links">
-            <Link to="/login" className="btn-ghost">Sign in</Link>
-            <Link to="/register" className="btn-primary">Get started <ArrowRight size={16} /></Link>
+            <button onClick={openLogin} className="btn-ghost">Sign in</button>
+            <button onClick={openRegister} className="btn-primary">Get started <ArrowRight size={16} /></button>
           </div>
         </div>
       </nav>
@@ -36,9 +43,9 @@ export default function Landing() {
           That gap is where the growth happens.
         </p>
         <div className="hero-ctas">
-          <Link to="/register" className="btn-primary btn-lg">
+          <button onClick={openRegister} className="btn-primary btn-lg">
             Start your first standup <ArrowRight size={18} />
-          </Link>
+          </button>
         </div>
       </section>
 
@@ -49,14 +56,16 @@ export default function Landing() {
       <section className="cta-section">
         <h2>Stop wondering where the day went.</h2>
         <p>For freelancers, indie hackers, remote workers, and anyone doing self-directed work.</p>
-        <Link to="/register" className="btn-primary btn-lg">
+        <button onClick={openRegister} className="btn-primary btn-lg">
           Get started, it's free <ArrowRight size={18} />
-        </Link>
+        </button>
       </section>
 
       <footer className="landing-footer">
         <p>built by <a href="https://github.com/demirreren" target="_blank" rel="noopener noreferrer">demir</a></p>
       </footer>
+
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
     </div>
   );
 }

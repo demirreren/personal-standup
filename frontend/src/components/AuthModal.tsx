@@ -1,14 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { X } from "lucide-react";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialMode?: "login" | "register";
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [mode, setMode] = useState<"login" | "register">("login");
+export default function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalProps) {
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
+
+  useEffect(() => { setMode(initialMode); }, [initialMode]);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
