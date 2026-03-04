@@ -1,8 +1,22 @@
 import { useState, useEffect } from "react";
 import { api, type Checkin } from "../lib/api";
-import { Sun, Moon, Zap, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sun, Moon, ChevronLeft, ChevronRight } from "lucide-react";
 
-const ENERGY_LABELS = ["", "Drained", "Low", "Okay", "Good", "Fired up"];
+function getFeelingLabel(value: number): string {
+  if (value <= 15) return "Drained";
+  if (value <= 35) return "Low";
+  if (value <= 55) return "Okay";
+  if (value <= 75) return "Good";
+  if (value <= 90) return "Great";
+  return "Energized";
+}
+
+function getFeelingColor(value: number): string {
+  if (value <= 25) return "#ef4444";
+  if (value <= 50) return "#f59e0b";
+  if (value <= 75) return "#5b9cf6";
+  return "#10b981";
+}
 
 export default function History() {
   const [checkins, setCheckins] = useState<Checkin[]>([]);
@@ -81,11 +95,25 @@ export default function History() {
                         <Sun size={14} />
                       </div>
                       <div className="entry-body">
-                        <p>{morning.body}</p>
-                        {morning.energy && (
-                          <span className="energy-tag">
-                            <Zap size={12} /> {ENERGY_LABELS[morning.energy]}
+                        {morning.feeling != null && (
+                          <span
+                            className="feeling-tag"
+                            style={{
+                              color: getFeelingColor(morning.feeling),
+                              background: `${getFeelingColor(morning.feeling)}15`,
+                            }}
+                          >
+                            {getFeelingLabel(morning.feeling)}
                           </span>
+                        )}
+                        {morning.yesterday && (
+                          <p><span className="history-field-label">Yesterday:</span> {morning.yesterday}</p>
+                        )}
+                        {morning.today_plan && (
+                          <p><span className="history-field-label">Plan:</span> {morning.today_plan}</p>
+                        )}
+                        {morning.blockers && (
+                          <p className="history-blocker"><span className="history-field-label">Blockers:</span> {morning.blockers}</p>
                         )}
                       </div>
                     </div>
@@ -96,11 +124,22 @@ export default function History() {
                         <Moon size={14} />
                       </div>
                       <div className="entry-body">
-                        <p>{evening.body}</p>
-                        {evening.energy && (
-                          <span className="energy-tag">
-                            <Zap size={12} /> {ENERGY_LABELS[evening.energy]}
+                        {evening.feeling != null && (
+                          <span
+                            className="feeling-tag"
+                            style={{
+                              color: getFeelingColor(evening.feeling),
+                              background: `${getFeelingColor(evening.feeling)}15`,
+                            }}
+                          >
+                            {getFeelingLabel(evening.feeling)}
                           </span>
+                        )}
+                        {evening.what_happened && (
+                          <p><span className="history-field-label">What happened:</span> {evening.what_happened}</p>
+                        )}
+                        {evening.carry_over && (
+                          <p className="history-blocker"><span className="history-field-label">Carrying over:</span> {evening.carry_over}</p>
                         )}
                       </div>
                     </div>

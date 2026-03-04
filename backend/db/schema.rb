@@ -10,18 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_03_205801) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_04_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "checkins", force: :cascade do |t|
-    t.text "body", null: false
+    t.text "blockers"
+    t.text "body"
+    t.text "carry_over"
     t.integer "checkin_type", null: false
     t.datetime "created_at", null: false
     t.date "date", null: false
     t.integer "energy"
+    t.integer "feeling"
+    t.text "today_plan"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.text "what_happened"
+    t.text "yesterday"
     t.index ["user_id", "date", "checkin_type"], name: "index_checkins_on_user_id_and_date_and_checkin_type", unique: true
     t.index ["user_id"], name: "index_checkins_on_user_id"
   end

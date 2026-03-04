@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api, type DashboardStats, type TrendDay } from "../lib/api";
-import { Flame, Target, Zap, Calendar, TrendingUp } from "lucide-react";
+import { Flame, Target, Calendar, TrendingUp, Heart } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -10,6 +10,15 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+
+function getFeelingLabel(value: number): string {
+  if (value <= 15) return "Drained";
+  if (value <= 35) return "Low";
+  if (value <= 55) return "Okay";
+  if (value <= 75) return "Good";
+  if (value <= 90) return "Great";
+  return "Energized";
+}
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -28,11 +37,11 @@ export default function Dashboard() {
 
   if (loading || !stats) return <div className="page-loading">Loading...</div>;
 
-  const energyData = trends
-    .filter((t) => t.energy != null)
+  const feelingData = trends
+    .filter((t) => t.feeling != null)
     .map((t) => ({
       date: formatShort(t.date),
-      energy: t.energy,
+      feeling: t.feeling,
     }));
 
   const completionData = trends.map((t) => ({
@@ -61,9 +70,9 @@ export default function Dashboard() {
           accent="var(--success)"
         />
         <StatCard
-          icon={<Zap size={20} />}
-          label="Avg Energy"
-          value={`${stats.avg_energy}/5`}
+          icon={<Heart size={20} />}
+          label="Avg Feeling"
+          value={stats.avg_feeling > 0 ? getFeelingLabel(stats.avg_feeling) : "—"}
           accent="var(--accent)"
         />
         <StatCard
@@ -74,28 +83,29 @@ export default function Dashboard() {
         />
       </div>
 
-      {energyData.length > 2 && (
+      {feelingData.length > 2 && (
         <div className="chart-card">
           <div className="chart-header">
-            <Zap size={16} />
-            <h3>Energy over time</h3>
+            <Heart size={16} />
+            <h3>Feeling over time</h3>
           </div>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={energyData}>
+            <AreaChart data={feelingData}>
               <defs>
-                <linearGradient id="energyGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6c63ff" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6c63ff" stopOpacity={0} />
+                <linearGradient id="feelingGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#5b9cf6" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#5b9cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
               <XAxis dataKey="date" tick={{ fill: "#5a5a66", fontSize: 11 }} tickLine={false} axisLine={false} />
-              <YAxis domain={[1, 5]} tick={{ fill: "#5a5a66", fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis domain={[0, 100]} tick={{ fill: "#5a5a66", fontSize: 11 }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{ background: "#141416", border: "1px solid #2a2a2e", borderRadius: 8, fontSize: 13 }}
                 labelStyle={{ color: "#8a8a96" }}
+                formatter={(value: number) => [`${value}/100 — ${getFeelingLabel(value)}`, "Feeling"]}
               />
-              <Area type="monotone" dataKey="energy" stroke="#6c63ff" fill="url(#energyGrad)" strokeWidth={2} />
+              <Area type="monotone" dataKey="feeling" stroke="#5b9cf6" fill="url(#feelingGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

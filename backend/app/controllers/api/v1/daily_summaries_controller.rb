@@ -40,6 +40,13 @@ module Api
         end
       end
 
+      def nudge
+        checkin = current_user.checkins.find(params[:checkin_id])
+        nudge_text = AiService.generate_nudge(current_user, checkin)
+
+        render json: { nudge: nudge_text }
+      end
+
       private
 
       def summary_json(summary)

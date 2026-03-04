@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { AnimatePresence } from "motion/react";
 import { useAuth } from "../context/AuthContext";
 import { LogOut, LogIn, Sun, BarChart3, Clock, Share2 } from "lucide-react";
 import AuthModal from "./AuthModal";
@@ -106,7 +107,15 @@ export default function Layout() {
         )}
       </main>
 
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+      <AnimatePresence>
+        {authOpen && (
+          <AuthModal
+            key="auth-modal"
+            onClose={() => setAuthOpen(false)}
+            initialMode={authMode}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

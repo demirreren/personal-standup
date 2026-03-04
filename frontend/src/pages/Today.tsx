@@ -5,14 +5,28 @@ import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
 import { api, type Checkin, type DailySummary } from "../lib/api";
 import {
-  Sun, Moon, Zap, Send, Check, Sparkles, Loader,
+  Sun, Moon, Send, Check, Sparkles, Loader,
   ArrowRight, RotateCcw, X,
 } from "lucide-react";
+import MetaBalls from "../components/MetaBalls";
 
-const ENERGY_LABELS = ["", "Drained", "Low", "Okay", "Good", "Fired up"];
+const LAYOUT_SPRING = { type: "spring" as const, stiffness: 75, damping: 18, mass: 1.1 };
 
-// Spring used for the shared-layout (layoutId) transitions
-const LAYOUT_SPRING = { type: "spring" as const, stiffness: 260, damping: 32, mass: 1 };
+function getFeelingLabel(value: number): string {
+  if (value <= 15) return "Drained";
+  if (value <= 35) return "Low";
+  if (value <= 55) return "Okay";
+  if (value <= 75) return "Good";
+  if (value <= 90) return "Great";
+  return "Energized";
+}
+
+function getFeelingColor(value: number): string {
+  if (value <= 25) return "#ef4444";
+  if (value <= 50) return "#f59e0b";
+  if (value <= 75) return "#5b9cf6";
+  return "#10b981";
+}
 
 function getSignedOutGreeting() {
   const h = new Date().getHours();
@@ -38,14 +52,23 @@ export default function Today() {
   const [summary, setSummary] = useState<DailySummary | null>(null);
   const [generatingSummary, setGeneratingSummary] = useState(false);
 
-  const [morningBody, setMorningBody] = useState("");
-  const [morningEnergy, setMorningEnergy] = useState<number | null>(null);
-  const [eveningBody, setEveningBody] = useState("");
-  const [eveningEnergy, setEveningEnergy] = useState<number | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  // Morning form state
+  const [mFeeling, setMFeeling] = useState(50);
+  const [mYesterday, setMYesterday] = useState("");
+  const [mTodayPlan, setMTodayPlan] = useState("");
+  const [mBlockers, setMBlockers] = useState("");
 
+  // Evening form state
+  const [eFeeling, setEFeeling] = useState(50);
+  const [eWhatHappened, setEWhatHappened] = useState("");
+  const [eCarryOver, setECarryOver] = useState("");
+
+  const [submitting, setSubmitting] = useState(false);
   const [morningFlipped, setMorningFlipped] = useState(false);
   const [eveningFlipped, setEveningFlipped] = useState(false);
+
+  // AI nudge state
+  const [nudge, setNudge] = useState<string | null>(null);
 
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", {
@@ -66,22 +89,58 @@ export default function Today() {
     });
   }, [user?.id]);
 
-  const submitCheckin = async (type: "morning" | "evening") => {
+  const submitMorning = async () => {
     setSubmitting(true);
     try {
-      const body = type === "morning" ? morningBody : eveningBody;
-      const energy = type === "morning" ? morningEnergy : eveningEnergy;
       const { checkin } = await api.checkins.create({
-        checkin_type: type,
-        body,
-        ...(energy ? { energy } : {}),
+        checkin_type: "morning",
+        feeling: mFeeling,
+        yesterday: mYesterday || undefined,
+        today_plan: mTodayPlan,
+        blockers: mBlockers || undefined,
       });
-      if (type === "morning") { setMorning(checkin); setMorningBody(""); }
-      else { setEvening(checkin); setEveningBody(""); }
+      setMorning(checkin);
+      setMYesterday("");
+      setMTodayPlan("");
+      setMBlockers("");
+
+      fetchNudge(checkin.id);
     } catch (err: unknown) {
       alert((err as Error).message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const submitEvening = async () => {
+    setSubmitting(true);
+    try {
+      const { checkin } = await api.checkins.create({
+        checkin_type: "evening",
+        feeling: eFeeling,
+        what_happened: eWhatHappened,
+        carry_over: eCarryOver || undefined,
+      });
+      setEvening(checkin);
+      setEWhatHappened("");
+      setECarryOver("");
+
+      fetchNudge(checkin.id);
+    } catch (err: unknown) {
+      alert((err as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const fetchNudge = async (checkinId: number) => {
+    try {
+      const { nudge: nudgeText } = await api.summaries.nudge(checkinId);
+      if (nudgeText) {
+        setNudge(nudgeText);
+      }
+    } catch {
+      // nudge is best-effort
     }
   };
 
@@ -91,34 +150,18 @@ export default function Today() {
 
   return (
     <>
-      {/*
-        initial={false} → skip entry animations when the page first loads
-        (prevents the layout animation from playing if the user is already signed in).
-        When the user explicitly signs in during a session, the animations DO play.
-      */}
       <AnimatePresence initial={false}>
-
-        {/* ================================================================
-            SIGNED-OUT STATE
-            The layoutId elements (greeting, both cards) are "registered" here
-            at their peek positions. When the signed-in tree renders with the
-            same layoutId values, Framer Motion flies them to the new positions.
-        ================================================================ */}
         {!user && (
           <motion.div
             key="signed-out"
             className="welcome-screen"
-            exit={{ opacity: 0, transition: { duration: 0.25, ease: "easeIn" } }}
+            exit={{ opacity: 0, transition: { duration: 0.15, ease: "easeIn" } }}
           >
-            {/* Center text block — the greeting layoutId sits here */}
             <div className="welcome-text-overlay">
-
-              {/* SHARED: greeting block — will fly to the top of the signed-in page */}
               <motion.div
                 layoutId="today-greeting"
-                layout
+                layout="position"
                 transition={LAYOUT_SPRING}
-                style={{ textAlign: "center" }}
               >
                 <SplitText
                   text={getSignedOutGreeting()}
@@ -136,377 +179,422 @@ export default function Today() {
                 />
               </motion.div>
 
-              {/* NON-SHARED: hint + button — these fade out */}
               <motion.p
                 className="welcome-hint"
-                exit={{ opacity: 0, y: -8, transition: { duration: 0.15 } }}
+                exit={{ opacity: 0, y: -10, transition: { duration: 0.25 } }}
               >
                 sign in to start your standup
               </motion.p>
               <motion.button
                 className="btn-get-started"
                 onClick={openLogin}
-                exit={{ opacity: 0, y: -8, scale: 0.95, transition: { duration: 0.15 } }}
+                exit={{ opacity: 0, y: -10, scale: 0.95, transition: { duration: 0.25 } }}
               >
                 Get started
                 <ArrowRight size={16} className="btn-get-started-arrow" />
               </motion.button>
             </div>
 
-            {/* SHARED: morning peek card — will fly to the flip card position */}
             <div className="welcome-card-peek welcome-card-peek--left">
               <PeekTiltWrapper>
-                <motion.div
-                  layoutId="card-morning"
-                  layout
-                  transition={LAYOUT_SPRING}
-                  initial={{ opacity: 0, y: 120, rotate: -6 }}
-                  animate={{ opacity: 1, y: 0, rotate: -6 }}
-                  className="peek-card"
-                  style={{
-                    filter: "drop-shadow(0 0 48px rgba(245, 158, 11, 0.22)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))",
-                  }}
-                >
-                  <div className="peek-card-body morning">
-                    <div className="peek-card-overlay">
-                      <span className="peek-card-label morning-label">☀️ Morning Check-in</span>
+                <div className="peek-card-glow morning-glow">
+                  <motion.div
+                    layoutId="card-morning"
+                    layout="position"
+                    transition={LAYOUT_SPRING}
+                    initial={{ opacity: 0, y: 120, rotate: -6 }}
+                    animate={{ opacity: 1, y: 0, rotate: -6 }}
+                    className="peek-card"
+                  >
+                    <div className="peek-card-body morning">
+                      <div className="peek-card-overlay">
+                        <span className="peek-card-label morning-label">☀️ Morning Standup</span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               </PeekTiltWrapper>
             </div>
 
-            {/* SHARED: evening peek card */}
             <div className="welcome-card-peek welcome-card-peek--right">
               <PeekTiltWrapper>
-                <motion.div
-                  layoutId="card-evening"
-                  layout
-                  transition={LAYOUT_SPRING}
-                  initial={{ opacity: 0, y: 120, rotate: 6 }}
-                  animate={{ opacity: 1, y: 0, rotate: 6 }}
-                  className="peek-card"
-                  style={{
-                    filter: "drop-shadow(0 0 48px rgba(139, 92, 246, 0.22)) drop-shadow(0 20px 40px rgba(0,0,0,0.6))",
-                  }}
-                >
-                  <div className="peek-card-body evening">
-                    <div className="peek-card-overlay">
-                      <span className="peek-card-label evening-label">🌙 Evening Check-out</span>
+                <div className="peek-card-glow evening-glow">
+                  <motion.div
+                    layoutId="card-evening"
+                    layout="position"
+                    transition={LAYOUT_SPRING}
+                    initial={{ opacity: 0, y: 120, rotate: 6 }}
+                    animate={{ opacity: 1, y: 0, rotate: 6 }}
+                    className="peek-card"
+                  >
+                    <div className="peek-card-body evening">
+                      <div className="peek-card-overlay">
+                        <span className="peek-card-label evening-label">🌙 Evening Reflection</span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               </PeekTiltWrapper>
             </div>
           </motion.div>
         )}
 
-        {/* ================================================================
-            SIGNED-IN STATE
-            The same layoutId elements appear here — Framer Motion animates
-            them from their signed-out screen positions to these new positions.
-        ================================================================ */}
         {user && (
           <motion.div
             key="signed-in"
             className="today-page-main"
+            exit={{ opacity: 0, transition: { duration: 0.35, ease: "easeIn" } }}
           >
-            {/* SHARED: greeting — animates from screen center to top of page */}
             <motion.header
               layoutId="today-greeting"
-              layout
+              layout="position"
               transition={LAYOUT_SPRING}
               className="today-greeting-header"
             >
-              {/*
-                Key on user.id so SplitText re-mounts and plays its char animation
-                while the container is flying from center → top-left simultaneously.
-              */}
-              <SplitText
+              <motion.h2
                 key={`greeting-${user.id}`}
-                text={getSignedInGreeting(user.name)}
-                tag="h2"
                 className="today-greeting-text"
-                delay={18}
-                duration={0.85}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 22 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0}
-                rootMargin="0px"
-                textAlign="left"
-              />
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+              >
+                {getSignedInGreeting(user.name)}
+              </motion.h2>
               <motion.p
                 className="date-label"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 0.55, duration: 0.4 }}
+                transition={{ delay: 0.45, duration: 0.4 }}
               >
                 {dateStr}
               </motion.p>
             </motion.header>
 
-            {checkinsLoading ? (
-              <div className="page-loading">Loading...</div>
-            ) : (
-              <>
-                <div className="standup-flip-cards">
-
-                  {/* SHARED: morning card — animates from peek position to here */}
-                  <motion.div
-                    layoutId="card-morning"
-                    layout
-                    transition={LAYOUT_SPRING}
-                    animate={{ rotate: 0 }}
-                    className={`standup-flip-card${morningFlipped ? " flipped" : ""}${morning ? " completed" : ""}`}
-                    onClick={() => !morningFlipped && setMorningFlipped(true)}
-                  >
-                    {/*
-                      The inner content fades in slightly delayed so the
-                      size-change from 320px² (peek) to full flip-card size
-                      is masked while the card is mid-flight.
-                    */}
-                    <motion.div
-                      className="standup-flip-card-inner"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.22, duration: 0.3 }}
-                    >
-                      <div className="standup-flip-card-front morning">
-                        <div className="flip-card-overlay morning-overlay">
-                          <div className="flip-card-top-row">
-                            {morning ? (
-                              <div className="flip-completed-badge"><Check size={12} /> Done</div>
-                            ) : (
-                              <div className="flip-icon-btn"><RotateCcw size={15} /></div>
-                            )}
-                          </div>
-                          <div className="flip-card-front-bottom">
-                            <div className="flip-card-title-row">
-                              <Sun size={22} className="flip-card-icon-morning" />
-                              <h3>Morning Check-in</h3>
-                            </div>
-                            {!morning && <p className="flip-card-open-hint">Click to open</p>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className="standup-flip-card-back"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="flip-back-header">
-                          <Sun size={18} className="flip-card-icon-morning" />
-                          <h3>Morning Check-in</h3>
+            <>
+              <div className="standup-stage">
+              <div className="standup-flip-cards">
+                {/* ---- MORNING CARD ---- */}
+                <motion.div
+                  layoutId="card-morning"
+                  layout="position"
+                  animate={{ rotate: 0 }}
+                  transition={LAYOUT_SPRING}
+                  className={`standup-flip-card morning-card${morningFlipped ? " flipped" : ""}${morning ? " completed" : ""}`}
+                  onClick={() => !morningFlipped && setMorningFlipped(true)}
+                >
+                  <div className="standup-flip-card-inner">
+                    <div className="standup-flip-card-front morning">
+                      <div className="flip-card-overlay morning-overlay">
+                        <div className="flip-card-top-row">
                           {morning ? (
-                            <Check size={16} className="check-icon" />
+                            <div className="flip-completed-badge"><Check size={12} /> Done</div>
                           ) : (
-                            <button
-                              className="flip-back-close"
-                              onClick={() => setMorningFlipped(false)}
-                            >
-                              <X size={13} />
-                            </button>
+                            <div className="flip-icon-btn"><RotateCcw size={15} /></div>
                           )}
                         </div>
-                        {morning ? (
-                          <div className="checkin-content">
-                            <p>{morning.body}</p>
-                            {morning.energy && (
-                              <div className="energy-display">
-                                <Zap size={14} />
-                                <span>{ENERGY_LABELS[morning.energy]}</span>
-                              </div>
-                            )}
+                        <div className="flip-card-front-bottom">
+                          <div className="flip-card-title-row">
+                            <Sun size={22} className="flip-card-icon-morning" />
+                            <h3>Morning Standup</h3>
                           </div>
-                        ) : (
-                          <form
-                            className="checkin-form"
-                            onSubmit={(e) => { e.preventDefault(); submitCheckin("morning"); }}
-                          >
-                            <textarea
-                              placeholder="What are you working on today? Any blockers?"
-                              value={morningBody}
-                              onChange={(e) => setMorningBody(e.target.value)}
-                              required
-                              rows={4}
-                            />
-                            <div className="checkin-form-footer">
-                              <EnergyPicker value={morningEnergy} onChange={setMorningEnergy} />
-                              <button
-                                type="submit"
-                                disabled={submitting || !morningBody.trim()}
-                                className="btn-primary btn-sm"
-                              >
-                                <Send size={14} /><span>Check in</span>
-                              </button>
-                            </div>
-                          </form>
-                        )}
+                          {!morning && <p className="flip-card-open-hint">Click to open</p>}
+                        </div>
                       </div>
-                    </motion.div>
-                  </motion.div>
+                    </div>
 
-                  {/* SHARED: evening card — animates from peek position to here */}
-                  <motion.div
-                    layoutId="card-evening"
-                    layout
-                    transition={LAYOUT_SPRING}
-                    animate={{ rotate: 0 }}
-                    className={`standup-flip-card${eveningFlipped ? " flipped" : ""}${evening ? " completed" : ""}`}
-                    onClick={() => !eveningFlipped && setEveningFlipped(true)}
-                  >
-                    <motion.div
-                      className="standup-flip-card-inner"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.32, duration: 0.3 }}
+                    <div
+                      className="standup-flip-card-back"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <div className="standup-flip-card-front evening">
-                        <div className="flip-card-overlay evening-overlay">
-                          <div className="flip-card-top-row">
-                            {evening ? (
-                              <div className="flip-completed-badge"><Check size={12} /> Done</div>
-                            ) : (
-                              <div className="flip-icon-btn"><RotateCcw size={15} /></div>
-                            )}
-                          </div>
-                          <div className="flip-card-front-bottom">
-                            <div className="flip-card-title-row">
-                              <Moon size={22} className="flip-card-icon-evening" />
-                              <h3>Evening Check-out</h3>
-                            </div>
-                            {!evening && <p className="flip-card-open-hint">Click to open</p>}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        className="standup-flip-card-back"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="flip-back-header">
-                          <Moon size={18} className="flip-card-icon-evening" />
-                          <h3>Evening Check-out</h3>
-                          {evening ? (
-                            <Check size={16} className="check-icon" />
-                          ) : (
-                            <button
-                              className="flip-back-close"
-                              onClick={() => setEveningFlipped(false)}
-                            >
-                              <X size={13} />
-                            </button>
-                          )}
-                        </div>
-                        {evening ? (
-                          <div className="checkin-content">
-                            <p>{evening.body}</p>
-                            {evening.energy && (
-                              <div className="energy-display">
-                                <Zap size={14} />
-                                <span>{ENERGY_LABELS[evening.energy]}</span>
-                              </div>
-                            )}
-                          </div>
+                      <div className="flip-back-header">
+                        <Sun size={18} className="flip-card-icon-morning" />
+                        <h3>Morning Standup</h3>
+                        {morning ? (
+                          <Check size={16} className="check-icon" />
                         ) : (
-                          <form
-                            className="checkin-form"
-                            onSubmit={(e) => { e.preventDefault(); submitCheckin("evening"); }}
+                          <button
+                            className="flip-back-close"
+                            onClick={() => setMorningFlipped(false)}
                           >
-                            <textarea
-                              placeholder="What did you actually finish? What's carrying over?"
-                              value={eveningBody}
-                              onChange={(e) => setEveningBody(e.target.value)}
-                              required
-                              rows={4}
-                            />
-                            <div className="checkin-form-footer">
-                              <EnergyPicker value={eveningEnergy} onChange={setEveningEnergy} />
-                              <button
-                                type="submit"
-                                disabled={submitting || !eveningBody.trim()}
-                                className="btn-primary btn-sm"
-                              >
-                                <Send size={14} /><span>Check out</span>
-                              </button>
-                            </div>
-                          </form>
+                            <X size={13} />
+                          </button>
                         )}
                       </div>
-                    </motion.div>
-                  </motion.div>
+                      {morning ? (
+                        <div className="checkin-content structured-content">
+                          {morning.feeling != null && (
+                            <FeelingDisplay value={morning.feeling} />
+                          )}
+                          {morning.yesterday && (
+                            <div className="standup-field">
+                              <span className="standup-field-label">Yesterday</span>
+                              <p>{morning.yesterday}</p>
+                            </div>
+                          )}
+                          <div className="standup-field">
+                            <span className="standup-field-label">Today's plan</span>
+                            <p>{morning.today_plan}</p>
+                          </div>
+                          {morning.blockers && (
+                            <div className="standup-field blocker-field">
+                              <span className="standup-field-label">Blockers</span>
+                              <p>{morning.blockers}</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <form
+                          className="checkin-form standup-form"
+                          onSubmit={(e) => { e.preventDefault(); submitMorning(); }}
+                        >
+                          <FeelingSlider value={mFeeling} onChange={setMFeeling} />
+                          <input
+                            type="text"
+                            className="standup-input"
+                            placeholder="What did you get done yesterday?"
+                            value={mYesterday}
+                            onChange={(e) => setMYesterday(e.target.value)}
+                          />
+                          <input
+                            type="text"
+                            className="standup-input"
+                            placeholder="What's the plan for today?"
+                            value={mTodayPlan}
+                            onChange={(e) => setMTodayPlan(e.target.value)}
+                            required
+                          />
+                          <input
+                            type="text"
+                            className="standup-input"
+                            placeholder="Any blockers? (optional)"
+                            value={mBlockers}
+                            onChange={(e) => setMBlockers(e.target.value)}
+                          />
+                          <div className="checkin-form-footer">
+                            <div />
+                            <button
+                              type="submit"
+                              disabled={submitting || !mTodayPlan.trim()}
+                              className="btn-primary btn-sm"
+                            >
+                              <Send size={14} /><span>Check in</span>
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* ---- METABALLS CONNECTOR ---- */}
+                <div className="cards-connector" aria-hidden="true">
+                  <MetaBalls
+                    color="#5b9cf6"
+                    cursorBallColor="#7eb8ff"
+                    cursorBallSize={2}
+                    ballCount={15}
+                    animationSize={30}
+                    enableMouseInteraction
+                    enableTransparency={true}
+                    hoverSmoothness={0.15}
+                    clumpFactor={1}
+                    speed={0.3}
+                  />
                 </div>
 
-                {morning && evening && (
-                  <motion.div
-                    className="day-complete"
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <Check size={24} />
-                    <p>You've completed both check-ins today. Nice work.</p>
-                  </motion.div>
-                )}
-
-                {(morning || evening) && (
-                  <motion.div
-                    className="summary-section"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                  >
-                    {summary ? (
-                      <div className="summary-card">
-                        <div className="summary-header">
-                          <Sparkles size={18} />
-                          <h3>AI Daily Summary</h3>
+                {/* ---- EVENING CARD ---- */}
+                <motion.div
+                  layoutId="card-evening"
+                  layout="position"
+                  animate={{ rotate: 0 }}
+                  transition={LAYOUT_SPRING}
+                  className={`standup-flip-card evening-card${eveningFlipped ? " flipped" : ""}${evening ? " completed" : ""}`}
+                  onClick={() => !eveningFlipped && setEveningFlipped(true)}
+                >
+                  <div className="standup-flip-card-inner">
+                    <div className="standup-flip-card-front evening">
+                      <div className="flip-card-overlay evening-overlay">
+                        <div className="flip-card-top-row">
+                          {evening ? (
+                            <div className="flip-completed-badge"><Check size={12} /> Done</div>
+                          ) : (
+                            <div className="flip-icon-btn"><RotateCcw size={15} /></div>
+                          )}
                         </div>
-                        <p className="summary-text">{summary.ai_summary}</p>
-                        {summary.carry_overs && (
-                          <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
+                        <div className="flip-card-front-bottom">
+                          <div className="flip-card-title-row">
+                            <Moon size={22} className="flip-card-icon-evening" />
+                            <h3>Evening Reflection</h3>
+                          </div>
+                          {!evening && <p className="flip-card-open-hint">Click to open</p>}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      className="standup-flip-card-back"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="flip-back-header">
+                        <Moon size={18} className="flip-card-icon-evening" />
+                        <h3>Evening Reflection</h3>
+                        {evening ? (
+                          <Check size={16} className="check-icon" />
+                        ) : (
+                          <button
+                            className="flip-back-close"
+                            onClick={() => setEveningFlipped(false)}
+                          >
+                            <X size={13} />
+                          </button>
                         )}
                       </div>
-                    ) : (
-                      <button
-                        className="btn-ghost generate-btn"
-                        onClick={async () => {
-                          setGeneratingSummary(true);
-                          try {
-                            const { daily_summary } = await api.summaries.generate();
-                            setSummary(daily_summary);
-                          } catch (err: unknown) {
-                            alert((err as Error).message);
-                          } finally {
-                            setGeneratingSummary(false);
-                          }
-                        }}
-                        disabled={generatingSummary}
-                      >
-                        {generatingSummary ? <Loader size={14} className="spin" /> : <Sparkles size={14} />}
-                        {generatingSummary ? "Generating..." : "Generate AI summary"}
-                      </button>
-                    )}
+                      {evening ? (
+                        <div className="checkin-content structured-content">
+                          {evening.feeling != null && (
+                            <FeelingDisplay value={evening.feeling} />
+                          )}
+                          <div className="standup-field">
+                            <span className="standup-field-label">What happened</span>
+                            <p>{evening.what_happened}</p>
+                          </div>
+                          {evening.carry_over && (
+                            <div className="standup-field blocker-field">
+                              <span className="standup-field-label">Carrying over</span>
+                              <p>{evening.carry_over}</p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <form
+                          className="checkin-form standup-form"
+                          onSubmit={(e) => { e.preventDefault(); submitEvening(); }}
+                        >
+                          <FeelingSlider value={eFeeling} onChange={setEFeeling} />
+                          <input
+                            type="text"
+                            className="standup-input"
+                            placeholder="What actually happened today?"
+                            value={eWhatHappened}
+                            onChange={(e) => setEWhatHappened(e.target.value)}
+                            required
+                          />
+                          <input
+                            type="text"
+                            className="standup-input"
+                            placeholder="Anything carrying over? (optional)"
+                            value={eCarryOver}
+                            onChange={(e) => setECarryOver(e.target.value)}
+                          />
+                          <div className="checkin-form-footer">
+                            <div />
+                            <button
+                              type="submit"
+                              disabled={submitting || !eWhatHappened.trim()}
+                              className="btn-primary btn-sm"
+                            >
+                              <Send size={14} /><span>Check out</span>
+                            </button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+              </div>
+
+              {morning && evening && (
+                <motion.div
+                  className="day-complete"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  <Check size={24} />
+                  <p>You've completed both check-ins today. Nice work.</p>
+                </motion.div>
+              )}
+
+              <AnimatePresence>
+                {nudge && (
+                  <motion.div
+                    className="ai-nudge"
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                  >
+                    <Sparkles size={14} className="nudge-icon" />
+                    <p>{nudge}</p>
+                    <button className="nudge-dismiss" onClick={() => setNudge(null)}>
+                      <X size={12} />
+                    </button>
                   </motion.div>
                 )}
-              </>
-            )}
+              </AnimatePresence>
+
+              {(morning || evening) && !nudge && (
+                <motion.div
+                  className="summary-section"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                >
+                  {summary ? (
+                    <div className="summary-card">
+                      <div className="summary-header">
+                        <Sparkles size={18} />
+                        <h3>AI Insight</h3>
+                      </div>
+                      <p className="summary-text">{summary.ai_summary}</p>
+                      {summary.carry_overs && (
+                        <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      className="btn-ghost generate-btn"
+                      onClick={async () => {
+                        setGeneratingSummary(true);
+                        try {
+                          const { daily_summary } = await api.summaries.generate();
+                          setSummary(daily_summary);
+                          if (daily_summary.ai_summary) {
+                            setNudge(daily_summary.ai_summary);
+                          }
+                        } catch (err: unknown) {
+                          alert((err as Error).message);
+                        } finally {
+                          setGeneratingSummary(false);
+                        }
+                      }}
+                      disabled={generatingSummary}
+                    >
+                      {generatingSummary ? <Loader size={14} className="spin" /> : <Sparkles size={14} />}
+                      {generatingSummary ? "Generating..." : "Generate AI insight"}
+                    </button>
+                  )}
+                </motion.div>
+              )}
+            </>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+      <AnimatePresence>
+        {authOpen && (
+          <AuthModal
+            key="today-auth-modal"
+            onClose={() => setAuthOpen(false)}
+            initialMode={authMode}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
 
-/**
- * Wraps peek cards with a 3D mouse-tracking tilt effect.
- * Lives OUTSIDE the layoutId element so there's no transform conflict
- * when the shared layout animation fires on sign-in.
- */
 function PeekTiltWrapper({ children }: { children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const rotateX = useSpring(useMotionValue(0), { stiffness: 120, damping: 28, mass: 1.5 });
@@ -535,27 +623,56 @@ function PeekTiltWrapper({ children }: { children: ReactNode }) {
   );
 }
 
-function EnergyPicker({
+function FeelingSlider({
   value,
   onChange,
 }: {
-  value: number | null;
-  onChange: (v: number | null) => void;
+  value: number;
+  onChange: (v: number) => void;
 }) {
   return (
-    <div className="energy-picker">
-      <Zap size={14} />
-      {[1, 2, 3, 4, 5].map((level) => (
-        <button
-          key={level}
-          type="button"
-          className={`energy-btn ${value === level ? "active" : ""}`}
-          onClick={() => onChange(value === level ? null : level)}
-          title={ENERGY_LABELS[level]}
+    <div className="feeling-slider">
+      <div className="feeling-slider-header">
+        <span className="feeling-label">How are you feeling?</span>
+        <span
+          className="feeling-value"
+          style={{ color: getFeelingColor(value) }}
         >
-          {level}
-        </button>
-      ))}
+          {getFeelingLabel(value)}
+        </span>
+      </div>
+      <div className="feeling-track-wrapper">
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="feeling-range"
+          style={{
+            background: `linear-gradient(to right, ${getFeelingColor(value)} ${value}%, rgba(255,255,255,0.08) ${value}%)`,
+          }}
+        />
+        <div className="feeling-track-labels">
+          <span>Drained</span>
+          <span>Energized</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FeelingDisplay({ value }: { value: number }) {
+  return (
+    <div className="feeling-display">
+      <div
+        className="feeling-dot"
+        style={{ background: getFeelingColor(value) }}
+      />
+      <span style={{ color: getFeelingColor(value) }}>
+        {getFeelingLabel(value)}
+      </span>
+      <span className="feeling-display-value">{value}/100</span>
     </div>
   );
 }

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
+import { motion } from "motion/react";
 import { useAuth } from "../context/AuthContext";
 import { X, Mail, Lock, User } from "lucide-react";
 
 interface AuthModalProps {
-  isOpen: boolean;
   onClose: () => void;
   initialMode?: "login" | "register";
 }
 
-export default function AuthModal({ isOpen, onClose, initialMode = "login" }: AuthModalProps) {
+export default function AuthModal({ onClose, initialMode = "login" }: AuthModalProps) {
   const [mode, setMode] = useState<"login" | "register">(initialMode);
 
   useEffect(() => { setMode(initialMode); }, [initialMode]);
@@ -19,8 +19,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
-
-  if (!isOpen) return null;
 
   const reset = () => {
     setMode("login");
@@ -60,7 +58,14 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
   };
 
   return (
-    <div className="modal-backdrop" onClick={handleClose}>
+    <motion.div
+      className="modal-backdrop"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      onClick={handleClose}
+    >
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={handleClose}>
           <X size={16} />
@@ -131,6 +136,6 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
           </button>
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }

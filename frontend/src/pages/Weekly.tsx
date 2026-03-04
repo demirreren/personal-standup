@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api, type WeeklyDigest } from "../lib/api";
-import { Sparkles, Loader, Copy, Check, TrendingUp, AlertTriangle, Zap } from "lucide-react";
+import { Sparkles, Loader, Copy, Check, TrendingUp, AlertTriangle, Heart } from "lucide-react";
 
 export default function Weekly() {
   const [digests, setDigests] = useState<WeeklyDigest[]>([]);
@@ -85,8 +85,8 @@ export default function Weekly() {
                 <div className="digest-metrics">
                   {digest.avg_energy != null && (
                     <div className="metric">
-                      <Zap size={14} />
-                      <span>Avg energy: {digest.avg_energy}/5</span>
+                      <Heart size={14} />
+                      <span>Avg feeling: {digest.avg_energy}/100</span>
                     </div>
                   )}
                   {digest.completion_rate != null && (

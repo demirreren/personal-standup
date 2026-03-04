@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
       get "daily_summaries", to: "daily_summaries#index"
       post "daily_summaries/generate", to: "daily_summaries#generate"
+      post "daily_summaries/nudge", to: "daily_summaries#nudge"
 
       get "weekly_digests", to: "weekly_digests#index"
       post "weekly_digests/generate", to: "weekly_digests#generate"

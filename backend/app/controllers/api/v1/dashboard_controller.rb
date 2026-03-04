@@ -9,10 +9,9 @@ module Api
 
         current_streak = calculate_streak(checkins, today)
         total_days = checkins.select(:date).distinct.count
-        avg_energy = checkins.where.not(energy: nil).average(:energy)&.round(1)
+        avg_feeling = checkins.where.not(feeling: nil).average(:feeling)&.round(0)
 
         morning_count = checkins.mornings.count
-        evening_count = checkins.evenings.count
         paired_days = checkins.mornings
           .where(date: checkins.evenings.select(:date))
           .select(:date).distinct.count
@@ -22,7 +21,7 @@ module Api
           stats: {
             current_streak: current_streak,
             total_days: total_days,
-            avg_energy: avg_energy || 0,
+            avg_feeling: avg_feeling || 0,
             completion_rate: completion_rate,
             total_checkins: checkins.count,
             member_since: current_user.created_at.to_date
@@ -35,10 +34,10 @@ module Api
         start_date = days.days.ago.to_date
         checkins = current_user.checkins.for_range(start_date, Date.today)
 
-        energy_by_day = checkins.where.not(energy: nil)
+        feeling_by_day = checkins.where.not(feeling: nil)
           .group(:date)
-          .average(:energy)
-          .transform_values { |v| v.round(1) }
+          .average(:feeling)
+          .transform_values { |v| v.round(0) }
 
         checkins_by_day = checkins.group(:date, :checkin_type).count
 
@@ -49,7 +48,7 @@ module Api
             date: date,
             has_morning: morning > 0,
             has_evening: evening > 0,
-            energy: energy_by_day[date],
+            feeling: feeling_by_day[date],
             completed: morning > 0 && evening > 0
           }
         end

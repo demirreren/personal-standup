@@ -40,9 +40,18 @@ export const api = {
       const query = params ? "?" + new URLSearchParams(params).toString() : "";
       return request<{ checkins: Checkin[] }>(`/api/v1/checkins${query}`);
     },
-    create: (data: { checkin_type: string; body: string; energy?: number; date?: string }) =>
+    create: (data: {
+      checkin_type: string;
+      feeling?: number;
+      yesterday?: string;
+      today_plan?: string;
+      blockers?: string;
+      what_happened?: string;
+      carry_over?: string;
+      date?: string;
+    }) =>
       request<{ checkin: Checkin }>("/api/v1/checkins", { method: "POST", body: JSON.stringify(data) }),
-    update: (id: number, data: { body?: string; energy?: number }) =>
+    update: (id: number, data: Partial<Omit<Checkin, "id" | "checkin_type" | "date" | "created_at">>) =>
       request<{ checkin: Checkin }>(`/api/v1/checkins/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   },
   summaries: {
@@ -54,6 +63,11 @@ export const api = {
       request<{ daily_summary: DailySummary }>("/api/v1/daily_summaries/generate", {
         method: "POST",
         body: JSON.stringify({ date }),
+      }),
+    nudge: (checkinId: number) =>
+      request<{ nudge: string | null }>("/api/v1/daily_summaries/nudge", {
+        method: "POST",
+        body: JSON.stringify({ checkin_id: checkinId }),
       }),
   },
   digests: {
@@ -87,8 +101,12 @@ export interface Checkin {
   id: number;
   checkin_type: "morning" | "evening";
   date: string;
-  body: string;
-  energy: number | null;
+  feeling: number | null;
+  yesterday: string | null;
+  today_plan: string | null;
+  blockers: string | null;
+  what_happened: string | null;
+  carry_over: string | null;
   created_at: string;
 }
 
@@ -118,7 +136,7 @@ export interface WeeklyDigest {
 export interface DashboardStats {
   current_streak: number;
   total_days: number;
-  avg_energy: number;
+  avg_feeling: number;
   completion_rate: number;
   total_checkins: number;
   member_since: string;
@@ -128,6 +146,6 @@ export interface TrendDay {
   date: string;
   has_morning: boolean;
   has_evening: boolean;
-  energy: number | null;
+  feeling: number | null;
   completed: boolean;
 }

@@ -51,7 +51,7 @@ module Api
       private
 
       def checkin_params
-        params.permit(:checkin_type, :date, :body, :energy)
+        params.permit(:checkin_type, :date, :feeling, :yesterday, :today_plan, :blockers, :what_happened, :carry_over)
       end
 
       def checkin_json(checkin)
@@ -59,8 +59,12 @@ module Api
           id: checkin.id,
           checkin_type: checkin.checkin_type,
           date: checkin.date,
-          body: checkin.body,
-          energy: checkin.energy,
+          feeling: checkin.feeling,
+          yesterday: checkin.yesterday,
+          today_plan: checkin.today_plan,
+          blockers: checkin.blockers,
+          what_happened: checkin.what_happened,
+          carry_over: checkin.carry_over,
           created_at: checkin.created_at
         }
       end

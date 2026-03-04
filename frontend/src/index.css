@@ -654,12 +654,25 @@ a, button, input, textarea, select, [role="button"] {
   font-size: 14px;
   font-weight: 600;
   animation: fadeUp 0.4s ease 0.2s backwards;
+  width: 100%;
+  max-width: 1100px;
+  padding-left: 40px;
+  padding-right: 40px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 /* ============ AI SUMMARY ============ */
 .summary-section {
   margin-top: 24px;
   animation: fadeUp 0.4s ease 0.25s backwards;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 40px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 .generate-btn {
@@ -709,6 +722,231 @@ a, button, input, textarea, select, [role="button"] {
   font-size: 13px;
   color: var(--warning);
   font-style: italic;
+}
+
+/* ============ FEELING SLIDER ============ */
+.feeling-slider {
+  margin-bottom: 4px;
+}
+
+.feeling-slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.feeling-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.feeling-value {
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.2s ease;
+}
+
+.feeling-track-wrapper {
+  position: relative;
+}
+
+.feeling-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.feeling-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feeling-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.feeling-range::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.1);
+}
+
+.feeling-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  cursor: grab;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.feeling-track-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* ============ FEELING DISPLAY (completed) ============ */
+.feeling-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.feeling-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.feeling-display-value {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 12px;
+}
+
+/* ============ STANDUP FORM INPUTS ============ */
+.standup-form {
+  gap: 10px !important;
+}
+
+.standup-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.standup-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.standup-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* ============ STRUCTURED CONTENT (completed view) ============ */
+.structured-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.standup-field {
+  padding: 6px 0;
+}
+
+.standup-field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.standup-field p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.blocker-field {
+  padding: 8px 12px;
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.12);
+  border-radius: var(--radius-sm);
+  margin-top: 4px;
+}
+
+.blocker-field .standup-field-label {
+  color: var(--warning);
+}
+
+/* ============ AI NUDGE ============ */
+.ai-nudge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 14px 40px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(139, 92, 246, 0.06) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.12);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 1100px;
+  box-sizing: border-box;
+  animation: fadeUp 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.nudge-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.ai-nudge p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.nudge-dismiss {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.nudge-dismiss:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
 }
 
 /* ============ HISTORY ============ */
@@ -786,6 +1024,27 @@ a, button, input, textarea, select, [role="button"] {
   margin-top: 6px;
   font-size: 11px;
   color: var(--text-muted);
+}
+
+.feeling-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.history-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+.history-blocker {
+  color: var(--warning) !important;
+  opacity: 0.85;
 }
 
 /* ============ DASHBOARD ============ */
@@ -1449,6 +1708,8 @@ a, button, input, textarea, select, [role="button"] {
   align-items: center;
   justify-content: center;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 .welcome-greeting {
@@ -1476,12 +1737,24 @@ a, button, input, textarea, select, [role="button"] {
 
 .welcome-card-peek--left {
   left: 18%;
-  /* rotation handled by Framer Motion animate={{ rotate: -6 }} */
 }
 
 .welcome-card-peek--right {
   right: 18%;
-  /* rotation handled by Framer Motion animate={{ rotate: 6 }} */
+}
+
+/* Filter wrapper sits OUTSIDE the layoutId element so Framer Motion
+   doesn't snapshot/animate the drop-shadow during the layout transition. */
+.peek-card-glow {
+  border-radius: 20px;
+}
+
+.peek-card-glow.morning-glow {
+  filter: drop-shadow(0 0 48px rgba(245, 158, 11, 0.22)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+}
+
+.peek-card-glow.evening-glow {
+  filter: drop-shadow(0 0 48px rgba(139, 92, 246, 0.22)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
 }
 
 @media (max-width: 900px) {
@@ -1552,7 +1825,7 @@ a, button, input, textarea, select, [role="button"] {
   align-items: center;
   justify-content: center;
   z-index: 100;
-  animation: fadeIn 0.2s ease;
+  /* opacity/fade handled by Framer Motion (motion.div with initial/animate/exit) */
 }
 
 .modal-content {
@@ -1755,55 +2028,142 @@ a, button, input, textarea, select, [role="button"] {
 
 /* ============ TODAY PAGE (signed-in) ============ */
 .today-page-main {
-  /* Sits inside main-content's normal flow, but needs to be above the
-     fading welcome-screen (position:fixed) during the layoutId animation */
-  position: relative;
+  /* Full-screen fixed canvas, same footprint as .welcome-screen.
+     This keeps both states in the same stacking context so the
+     layoutId shared-element animations (greeting + cards flying) work cleanly. */
+  position: fixed;
+  inset: 0;
+  left: var(--sidebar-collapsed);
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Push content towards the top – mirrors the visual weight of the welcome screen */
+  padding-top: 11vh;
+  padding-bottom: 40px;
+  overflow-y: auto;
 }
 
 /* ============ TODAY SIGNED-IN GREETING ============ */
 .today-greeting-header {
-  margin-bottom: 32px;
+  text-align: center;
+  margin-bottom: 48px;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 .today-greeting-text {
-  font-size: 50px;
+  font-size: 62px;
   font-weight: 800;
-  letter-spacing: -1.8px;
+  letter-spacing: -2.5px;
   line-height: 1.05;
   color: var(--text);
   font-family: 'Inter', -apple-system, sans-serif;
+  text-align: center;
 }
 
 .today-greeting-header .date-label {
   font-size: 16px;
-  margin-top: 8px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* ============ STANDUP STAGE (glass wrapper behind both cards) ============ */
+.standup-stage {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 40px;
+  margin-top: 4px;
+  z-index: 1;
+}
+
+/* Glass panel behind both cards */
+.standup-stage::before {
+  content: '';
+  position: absolute;
+  inset: -22px -10px;
+  background: rgba(12, 15, 24, 0.52);
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Ambient gradient aura beneath the cards */
+.standup-stage::after {
+  content: '';
+  position: absolute;
+  bottom: -72px;
+  left: 8%;
+  right: 8%;
+  height: 110px;
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.22) 0%,
+    rgba(91, 156, 246, 0.06) 50%,
+    rgba(139, 92, 246, 0.22) 100%
+  );
+  filter: blur(44px);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* ============ STANDUP FLIP CARDS ============ */
 .standup-flip-cards {
   display: flex;
-  gap: 20px;
-  margin-top: 4px;
+  gap: 36px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
 }
 
 .standup-flip-card {
   flex: 1;
   perspective: 1400px;
-  min-height: 300px;
+  min-height: 380px;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
 }
 
 .standup-flip-card.completed {
   cursor: default;
 }
 
+/* ---- Morning / Evening accent glow on the card shell ---- */
+.standup-flip-card.morning-card .standup-flip-card-inner {
+  box-shadow:
+    0 20px 64px rgba(245, 158, 11, 0.14),
+    0 0 0 1px rgba(245, 158, 11, 0.1);
+}
+
+.standup-flip-card.evening-card .standup-flip-card-inner {
+  box-shadow:
+    0 20px 64px rgba(139, 92, 246, 0.14),
+    0 0 0 1px rgba(139, 92, 246, 0.1);
+}
+
+/* ---- MetaBalls connector between the two cards ---- */
+.cards-connector {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  transform: translateX(-50%);
+  /* wide enough to let the balls spill left/right across the gap */
+  width: 220px;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .standup-flip-card-inner {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 300px;
+  min-height: 380px;
   transform-style: preserve-3d;
   transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -1826,14 +2186,17 @@ a, button, input, textarea, select, [role="button"] {
 .standup-flip-card-front {
   background-size: cover;
   background-position: center;
+  filter: grayscale(30%) brightness(0.82);
 }
 
 .standup-flip-card-front.morning {
   background-image: url('/morning.jpg');
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.18);
 }
 
 .standup-flip-card-front.evening {
   background-image: url('/evening.jpg');
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.18);
 }
 
 .flip-card-overlay {
@@ -1846,11 +2209,11 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .flip-card-overlay.morning-overlay {
-  background: linear-gradient(170deg, rgba(245, 158, 11, 0.18) 0%, rgba(0, 0, 0, 0.72) 100%);
+  background: linear-gradient(170deg, rgba(30, 40, 70, 0.25) 0%, rgba(0, 0, 0, 0.72) 100%);
 }
 
 .flip-card-overlay.evening-overlay {
-  background: linear-gradient(170deg, rgba(139, 92, 246, 0.2) 0%, rgba(0, 0, 0, 0.72) 100%);
+  background: linear-gradient(170deg, rgba(30, 40, 70, 0.25) 0%, rgba(0, 0, 0, 0.72) 100%);
 }
 
 .flip-card-top-row {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AnimatePresence } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import Aurora from "../components/Aurora";
 import BentoGrid from "../components/BentoGrid";
@@ -114,7 +115,15 @@ export default function Landing() {
         <p>built by <a href="https://github.com/demirreren" target="_blank" rel="noopener noreferrer">demir</a></p>
       </footer>
 
-      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode={authMode} />
+      <AnimatePresence>
+        {authOpen && (
+          <AuthModal
+            key="auth-modal"
+            onClose={() => setAuthOpen(false)}
+            initialMode={authMode}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
