@@ -5,6 +5,7 @@ import { LogOut, LogIn, Sun, BarChart3, Clock, Share2, ArrowRight } from "lucide
 import AuthModal from "./AuthModal";
 import SplitText from "./SplitText";
 import LockedOverlay from "./LockedOverlay";
+import TiltedCard from "./TiltedCard";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -133,6 +134,50 @@ export default function Layout() {
                 Get started
                 <ArrowRight size={16} className="btn-get-started-arrow" />
               </button>
+            </div>
+
+            <div className="welcome-card-peek welcome-card-peek--left">
+              <TiltedCard
+                imageSrc="/morning.jpg"
+                altText="Morning check-in"
+                captionText="Morning Check-in"
+                containerHeight="360px"
+                containerWidth="360px"
+                imageHeight="360px"
+                imageWidth="360px"
+                rotateAmplitude={10}
+                scaleOnHover={1.05}
+                showMobileWarning={false}
+                showTooltip
+                displayOverlayContent
+                overlayContent={
+                  <div className="checkin-card-label morning-label">
+                    ☀️ Morning Check-in
+                  </div>
+                }
+              />
+            </div>
+
+            <div className="welcome-card-peek welcome-card-peek--right">
+              <TiltedCard
+                imageSrc="/evening.jpg"
+                altText="Evening check-out"
+                captionText="Evening Check-out"
+                containerHeight="360px"
+                containerWidth="360px"
+                imageHeight="360px"
+                imageWidth="360px"
+                rotateAmplitude={10}
+                scaleOnHover={1.05}
+                showMobileWarning={false}
+                showTooltip
+                displayOverlayContent
+                overlayContent={
+                  <div className="checkin-card-label evening-label">
+                    🌙 Evening Check-out
+                  </div>
+                }
+              />
             </div>
           </div>
         )}

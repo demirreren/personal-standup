@@ -1119,6 +1119,77 @@ a, button, input, textarea, select, [role="button"] {
   flex-wrap: wrap;
 }
 
+/* ============ CHECKIN PREVIEW (TILTED CARDS) ============ */
+.checkin-preview-section {
+  padding: 0 24px 100px;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 48px;
+  animation: fadeUp 0.5s ease 0.2s backwards;
+}
+
+.checkin-preview-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.checkin-preview-cards {
+  display: flex;
+  gap: 40px;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.checkin-preview-item {
+  animation: slideUpCard 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+.checkin-preview-item:nth-child(1) { animation-delay: 0.3s; }
+.checkin-preview-item:nth-child(2) { animation-delay: 0.5s; }
+
+@keyframes slideUpCard {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.checkin-card-label {
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.morning-label,
+.evening-label {
+  background: rgba(40, 40, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .checkin-preview-cards {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+}
+
 /* Bento grid */
 .bento-section {
   padding: 0 24px 80px;
@@ -1346,6 +1417,18 @@ a, button, input, textarea, select, [role="button"] {
   animation: fadeIn 0.6s ease;
 }
 
+.welcome-screen::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25%;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .welcome-text-overlay {
   display: flex;
   flex-direction: column;
@@ -1369,6 +1452,49 @@ a, button, input, textarea, select, [role="button"] {
   color: var(--text-secondary);
   font-weight: 400;
   animation: fadeUp 0.6s ease 0.8s backwards;
+}
+
+.welcome-card-peek {
+  position: absolute;
+  bottom: -100px;
+  animation: peekUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s backwards;
+}
+
+.welcome-card-peek--left {
+  left: 18%;
+  transform: rotate(-6deg);
+  animation-delay: 0.7s;
+  filter: drop-shadow(0 0 48px rgba(245, 158, 11, 0.18)) drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+}
+
+.welcome-card-peek--right {
+  right: 18%;
+  transform: rotate(6deg);
+  animation-delay: 0.9s;
+  filter: drop-shadow(0 0 48px rgba(139, 92, 246, 0.18)) drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+}
+
+@keyframes peekUp {
+  from {
+    opacity: 0;
+    transform: translateY(120px) rotate(var(--peek-rotate, 0deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(var(--peek-rotate, 0deg));
+  }
+}
+
+.welcome-card-peek--left {
+  --peek-rotate: -6deg;
+}
+
+.welcome-card-peek--right {
+  --peek-rotate: 6deg;
+}
+
+@media (max-width: 900px) {
+  .welcome-card-peek { display: none; }
 }
 
 .btn-get-started {

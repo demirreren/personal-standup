@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import Aurora from "../components/Aurora";
 import BentoGrid from "../components/BentoGrid";
 import AuthModal from "../components/AuthModal";
+import TiltedCard from "../components/TiltedCard";
 
 export default function Landing() {
   const [authOpen, setAuthOpen] = useState(false);
@@ -46,6 +47,54 @@ export default function Landing() {
           <button onClick={openRegister} className="btn-primary btn-lg">
             Start your first standup <ArrowRight size={18} />
           </button>
+        </div>
+      </section>
+
+      <section className="checkin-preview-section">
+        <p className="checkin-preview-label">your day, in two moments</p>
+        <div className="checkin-preview-cards">
+          <div className="checkin-preview-item">
+            <TiltedCard
+              imageSrc="/morning.jpg"
+              altText="Morning check-in"
+              captionText="Morning Check-in"
+              containerHeight="380px"
+              containerWidth="280px"
+              imageHeight="380px"
+              imageWidth="280px"
+              rotateAmplitude={12}
+              scaleOnHover={1.05}
+              showMobileWarning={false}
+              showTooltip
+              displayOverlayContent
+              overlayContent={
+                <div className="checkin-card-label morning-label">
+                  ☀️ Morning Check-in
+                </div>
+              }
+            />
+          </div>
+          <div className="checkin-preview-item">
+            <TiltedCard
+              imageSrc="/evening.jpg"
+              altText="Evening check-out"
+              captionText="Evening Check-out"
+              containerHeight="380px"
+              containerWidth="280px"
+              imageHeight="380px"
+              imageWidth="280px"
+              rotateAmplitude={12}
+              scaleOnHover={1.05}
+              showMobileWarning={false}
+              showTooltip
+              displayOverlayContent
+              overlayContent={
+                <div className="checkin-card-label evening-label">
+                  🌙 Evening Check-out
+                </div>
+              }
+            />
+          </div>
         </div>
       </section>
 
