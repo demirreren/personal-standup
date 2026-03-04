@@ -1,18 +1,9 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LogOut, LogIn, Sun, BarChart3, Clock, Share2, ArrowRight } from "lucide-react";
+import { LogOut, LogIn, Sun, BarChart3, Clock, Share2 } from "lucide-react";
 import AuthModal from "./AuthModal";
-import SplitText from "./SplitText";
 import LockedOverlay from "./LockedOverlay";
-import TiltedCard from "./TiltedCard";
-
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Ready to plan your day?";
-  if (hour < 17) return "How's the day going?";
-  return "Time to reflect.";
-}
 
 const LOCKED_PAGES = {
   "/history": "history",
@@ -105,81 +96,13 @@ export default function Layout() {
       </nav>
 
       <main className="main-content">
-        {user ? (
-          <Outlet />
-        ) : LOCKED_PAGES[location.pathname as LockedPageKey] ? (
+        {!user && LOCKED_PAGES[location.pathname as LockedPageKey] ? (
           <LockedOverlay
             page={LOCKED_PAGES[location.pathname as LockedPageKey]}
             onSignIn={openLogin}
           />
         ) : (
-          <div className="welcome-screen">
-            <div className="welcome-text-overlay">
-              <SplitText
-                text={getGreeting()}
-                tag="h1"
-                className="welcome-greeting"
-                delay={40}
-                duration={1.25}
-                ease="power3.out"
-                splitType="chars"
-                from={{ opacity: 0, y: 40 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.1}
-                rootMargin="0px"
-                textAlign="center"
-              />
-              <p className="welcome-hint">sign in to start your standup</p>
-              <button className="btn-get-started" onClick={openLogin}>
-                Get started
-                <ArrowRight size={16} className="btn-get-started-arrow" />
-              </button>
-            </div>
-
-            <div className="welcome-card-peek welcome-card-peek--left">
-              <TiltedCard
-                imageSrc="/morning.jpg"
-                altText="Morning check-in"
-                captionText="Morning Check-in"
-                containerHeight="360px"
-                containerWidth="360px"
-                imageHeight="360px"
-                imageWidth="360px"
-                rotateAmplitude={10}
-                scaleOnHover={1.05}
-                showMobileWarning={false}
-                showTooltip
-                displayOverlayContent
-                overlayContent={
-                  <div className="checkin-card-label morning-label">
-                    ☀️ Morning Check-in
-                  </div>
-                }
-              />
-            </div>
-
-            <div className="welcome-card-peek welcome-card-peek--right">
-              <TiltedCard
-                imageSrc="/evening.jpg"
-                altText="Evening check-out"
-                captionText="Evening Check-out"
-                containerHeight="360px"
-                containerWidth="360px"
-                imageHeight="360px"
-                imageWidth="360px"
-                rotateAmplitude={10}
-                scaleOnHover={1.05}
-                showMobileWarning={false}
-                showTooltip
-                displayOverlayContent
-                overlayContent={
-                  <div className="checkin-card-label evening-label">
-                    🌙 Evening Check-out
-                  </div>
-                }
-              />
-            </div>
-          </div>
+          <Outlet />
         )}
       </main>
 

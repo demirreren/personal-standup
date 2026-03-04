@@ -255,11 +255,26 @@ a, button, input, textarea, select, [role="button"] {
 .sidebar-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: 12px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.05);
   white-space: nowrap;
   min-height: 48px;
+}
+
+.sidebar:hover .sidebar-footer {
+  justify-content: space-between;
+}
+
+.user-info {
+  overflow: hidden;
+  max-width: 0;
+  transition: max-width 0.2s ease 0s;
+}
+
+.sidebar:hover .user-info {
+  max-width: 150px;
+  transition-delay: 0.05s;
 }
 
 .user-name {
@@ -281,7 +296,7 @@ a, button, input, textarea, select, [role="button"] {
   border: none;
   color: rgba(90, 101, 128, 0.7);
   cursor: pointer;
-  padding: 8px;
+  padding: 10px 12px;
   border-radius: 8px;
   display: flex;
   flex-shrink: 0;
@@ -1414,7 +1429,6 @@ a, button, input, textarea, select, [role="button"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.6s ease;
 }
 
 .welcome-screen::after {
@@ -1457,40 +1471,17 @@ a, button, input, textarea, select, [role="button"] {
 .welcome-card-peek {
   position: absolute;
   bottom: -100px;
-  animation: peekUp 1s cubic-bezier(0.22, 1, 0.36, 1) 0.6s backwards;
+  /* Entrance animation handled by Framer Motion on the inner motion.div */
 }
 
 .welcome-card-peek--left {
   left: 18%;
-  transform: rotate(-6deg);
-  animation-delay: 0.7s;
-  filter: drop-shadow(0 0 48px rgba(245, 158, 11, 0.18)) drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+  /* rotation handled by Framer Motion animate={{ rotate: -6 }} */
 }
 
 .welcome-card-peek--right {
   right: 18%;
-  transform: rotate(6deg);
-  animation-delay: 0.9s;
-  filter: drop-shadow(0 0 48px rgba(139, 92, 246, 0.18)) drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-}
-
-@keyframes peekUp {
-  from {
-    opacity: 0;
-    transform: translateY(120px) rotate(var(--peek-rotate, 0deg));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) rotate(var(--peek-rotate, 0deg));
-  }
-}
-
-.welcome-card-peek--left {
-  --peek-rotate: -6deg;
-}
-
-.welcome-card-peek--right {
-  --peek-rotate: 6deg;
+  /* rotation handled by Framer Motion animate={{ rotate: 6 }} */
 }
 
 @media (max-width: 900px) {
@@ -1715,6 +1706,285 @@ a, button, input, textarea, select, [role="button"] {
   body, a, button, input, textarea, select, [role="button"] {
     cursor: auto;
   }
+}
+
+/* ============ PEEK CARDS (signed-out, replaces TiltedCard) ============ */
+.peek-card {
+  width: 320px;
+  height: 320px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.peek-card-body {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.peek-card-body.morning { background-image: url('/morning.jpg'); }
+.peek-card-body.evening { background-image: url('/evening.jpg'); }
+
+.peek-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  /* Label sits at the TOP — that's the visible portion when cards peek from the bottom */
+  align-items: flex-start;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, transparent 55%);
+}
+
+/* Reuse the same pill badge style as the original checkin-card-label */
+.peek-card-label {
+  white-space: nowrap;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(40, 40, 40, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* ============ TODAY PAGE (signed-in) ============ */
+.today-page-main {
+  /* Sits inside main-content's normal flow, but needs to be above the
+     fading welcome-screen (position:fixed) during the layoutId animation */
+  position: relative;
+  z-index: 2;
+}
+
+/* ============ TODAY SIGNED-IN GREETING ============ */
+.today-greeting-header {
+  margin-bottom: 32px;
+  overflow: visible;
+}
+
+.today-greeting-text {
+  font-size: 50px;
+  font-weight: 800;
+  letter-spacing: -1.8px;
+  line-height: 1.05;
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+
+.today-greeting-header .date-label {
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+/* ============ STANDUP FLIP CARDS ============ */
+.standup-flip-cards {
+  display: flex;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.standup-flip-card {
+  flex: 1;
+  perspective: 1400px;
+  min-height: 300px;
+  cursor: pointer;
+}
+
+.standup-flip-card.completed {
+  cursor: default;
+}
+
+.standup-flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  transform-style: preserve-3d;
+  transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.standup-flip-card.flipped .standup-flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.standup-flip-card-front,
+.standup-flip-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Front face */
+.standup-flip-card-front {
+  background-size: cover;
+  background-position: center;
+}
+
+.standup-flip-card-front.morning {
+  background-image: url('/morning.jpg');
+}
+
+.standup-flip-card-front.evening {
+  background-image: url('/evening.jpg');
+}
+
+.flip-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px 22px;
+}
+
+.flip-card-overlay.morning-overlay {
+  background: linear-gradient(170deg, rgba(245, 158, 11, 0.18) 0%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.flip-card-overlay.evening-overlay {
+  background: linear-gradient(170deg, rgba(139, 92, 246, 0.2) 0%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.flip-card-top-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.flip-icon-btn {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.standup-flip-card:hover .flip-icon-btn {
+  background: rgba(255, 255, 255, 0.28);
+  color: white;
+  transform: rotate(-15deg);
+}
+
+.flip-completed-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  background: rgba(16, 185, 129, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  color: #34d399;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.flip-card-front-bottom {
+  /* anchored to bottom by flex justify-content: space-between */
+}
+
+.flip-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flip-card-title-row h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.flip-card-open-hint {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.flip-card-icon-morning { color: var(--morning); }
+.flip-card-icon-evening { color: var(--evening); }
+
+/* Back face */
+.standup-flip-card-back {
+  transform: rotateY(180deg);
+  background: rgba(10, 13, 20, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  padding: 22px 24px;
+  gap: 0;
+  box-shadow: var(--shadow-card);
+}
+
+.flip-back-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.flip-back-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.flip-back-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.flip-back-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text);
+}
+
+.standup-flip-card-back .checkin-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.standup-flip-card-back .checkin-form textarea {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+}
+
+.standup-flip-card-back .checkin-content {
+  flex: 1;
 }
 
 /* ============ RESPONSIVE ============ */
