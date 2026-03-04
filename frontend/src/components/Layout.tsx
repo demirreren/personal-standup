@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { LogOut, LogIn, Sun, BarChart3, Clock, Share2 } from "lucide-react";
+import { LogOut, LogIn, Sun, BarChart3, Clock, Share2, ArrowRight } from "lucide-react";
 import AuthModal from "./AuthModal";
 import SplitText from "./SplitText";
+import LockedOverlay from "./LockedOverlay";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -12,9 +13,18 @@ function getGreeting() {
   return "Time to reflect.";
 }
 
+const LOCKED_PAGES = {
+  "/history": "history",
+  "/dashboard": "dashboard",
+  "/weekly": "weekly",
+} as const;
+
+type LockedPageKey = keyof typeof LOCKED_PAGES;
+
 export default function Layout() {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "register">("login");
 
@@ -33,8 +43,8 @@ export default function Layout() {
         <div className="sidebar-header">
           <div className="logo-mark">
             <svg className="logo-icon-svg" width="30" height="30" viewBox="0 0 30 30" fill="none">
-              {/* Ball — always visible */}
-              <circle cx="10" cy="26.5" r="3.5" fill="var(--primary)" />
+              {/* Ball — fades on hover, replaced by the period in text */}
+              <circle className="logo-ball" cx="10" cy="26.5" r="3.5" fill="var(--primary)" />
               {/* Figure — fades on hover */}
               <g className="logo-figure-group" stroke="var(--primary)" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
                 {/* Head */}
@@ -52,7 +62,7 @@ export default function Layout() {
               </g>
             </svg>
           </div>
-          <h1 className="logo">standup</h1>
+          <h1 className="logo">standup<span className="logo-dot" /></h1>
         </div>
 
         <div className="nav-links">
@@ -96,6 +106,11 @@ export default function Layout() {
       <main className="main-content">
         {user ? (
           <Outlet />
+        ) : LOCKED_PAGES[location.pathname as LockedPageKey] ? (
+          <LockedOverlay
+            page={LOCKED_PAGES[location.pathname as LockedPageKey]}
+            onSignIn={openLogin}
+          />
         ) : (
           <div className="welcome-screen">
             <div className="welcome-text-overlay">
@@ -114,6 +129,10 @@ export default function Layout() {
                 textAlign="center"
               />
               <p className="welcome-hint">sign in to start your standup</p>
+              <button className="btn-get-started" onClick={openLogin}>
+                Get started
+                <ArrowRight size={16} className="btn-get-started-arrow" />
+              </button>
             </div>
           </div>
         )}

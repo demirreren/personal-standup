@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import { X } from "lucide-react";
+import { X, Mail, Lock, User } from "lucide-react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -63,48 +63,67 @@ export default function AuthModal({ isOpen, onClose, initialMode = "login" }: Au
     <div className="modal-backdrop" onClick={handleClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={handleClose}>
-          <X size={18} />
+          <X size={16} />
         </button>
+
+        <div className="modal-brand">
+          standup<span className="modal-brand-dot">.</span>
+        </div>
+
         <h2 className="modal-title">
-          standup<span className="logo-dot">.</span>
+          {mode === "login" ? "Welcome back" : "Create account"}
         </h2>
         <p className="modal-subtitle">
-          {mode === "login" ? "Welcome back" : "Start your accountability habit"}
+          {mode === "login" ? "Sign in to your standup" : "Start your accountability habit"}
         </p>
+
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="error-msg">{error}</div>}
           {mode === "register" && (
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              autoFocus
-            />
+            <div className="input-wrapper">
+              <User size={14} className="input-icon" />
+              <input
+                type="text"
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                autoFocus
+                className="input-with-icon"
+              />
+            </div>
           )}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus={mode === "login"}
-          />
-          <input
-            type="password"
-            placeholder={mode === "register" ? "Password (min 6 characters)" : "Password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={mode === "register" ? 6 : undefined}
-          />
-          <button type="submit" disabled={loading} className="btn-primary">
+          <div className="input-wrapper">
+            <Mail size={14} className="input-icon" />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              autoFocus={mode === "login"}
+              className="input-with-icon"
+            />
+          </div>
+          <div className="input-wrapper">
+            <Lock size={14} className="input-icon" />
+            <input
+              type="password"
+              placeholder={mode === "register" ? "Password (min 6 chars)" : "Password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={mode === "register" ? 6 : undefined}
+              className="input-with-icon"
+            />
+          </div>
+          <button type="submit" disabled={loading} className="btn-modal-submit">
             {loading
               ? mode === "login" ? "Signing in..." : "Creating account..."
               : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
+
         <p className="modal-footer-text">
           {mode === "login" ? "Don't have an account? " : "Already have an account? "}
           <button className="modal-switch-btn" onClick={switchMode}>

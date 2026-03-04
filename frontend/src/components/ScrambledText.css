@@ -1,0 +1,16 @@
+.scrambled-text-block {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+  color: rgba(238, 240, 246, 0.55);
+  line-height: 1.5;
+  text-align: center;
+  user-select: none;
+}
+
+.scrambled-text-block p {
+  margin: 0;
+}
+
+.scrambled-text-block .char {
+  will-change: transform;
+  display: inline-block;
+}
