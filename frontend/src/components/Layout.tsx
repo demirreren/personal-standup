@@ -27,6 +27,7 @@ export default function Layout() {
   };
 
   const openLogin = () => { setAuthMode("login"); setAuthOpen(true); };
+  const isHistoryPage = location.pathname === "/history";
 
   if (loading) return <div className="page-loading">Loading...</div>;
 
@@ -96,7 +97,7 @@ export default function Layout() {
         </div>
       </nav>
 
-      <main className="main-content">
+      <main className={`main-content ${isHistoryPage ? "main-content-wide" : ""}`}>
         {!user && LOCKED_PAGES[location.pathname as LockedPageKey] ? (
           <LockedOverlay
             page={LOCKED_PAGES[location.pathname as LockedPageKey]}

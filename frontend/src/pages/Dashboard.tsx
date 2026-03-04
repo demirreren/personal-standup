@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api, type DashboardStats, type TrendDay } from "../lib/api";
-import { Flame, Target, Calendar, TrendingUp, Heart } from "lucide-react";
+import { Flame, Calendar, TrendingUp, Heart } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -8,16 +8,20 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 
 function getFeelingLabel(value: number): string {
-  if (value <= 15) return "Drained";
-  if (value <= 35) return "Low";
-  if (value <= 55) return "Okay";
-  if (value <= 75) return "Good";
-  if (value <= 90) return "Great";
+  if (value <= 2) return "Drained";
+  if (value <= 4) return "Low";
+  if (value <= 6) return "Okay";
+  if (value <= 8) return "Good";
+  if (value === 9) return "Great";
   return "Energized";
+}
+
+function getFeelingColor(value: number): string {
+  const hue = Math.round(((value - 1) / 9) * 120);
+  return `hsl(${hue}, 52%, 52%)`;
 }
 
 export default function Dashboard() {
@@ -39,10 +43,7 @@ export default function Dashboard() {
 
   const feelingData = trends
     .filter((t) => t.feeling != null)
-    .map((t) => ({
-      date: formatShort(t.date),
-      feeling: t.feeling,
-    }));
+    .map((t) => ({ date: formatShort(t.date), feeling: t.feeling }));
 
   const completionData = trends.map((t) => ({
     date: formatShort(t.date),
@@ -56,56 +57,50 @@ export default function Dashboard() {
         <p className="date-label">Your accountability at a glance</p>
       </header>
 
-      <div className="stats-grid">
-        <StatCard
-          icon={<Flame size={20} />}
-          label="Current Streak"
-          value={`${stats.current_streak} day${stats.current_streak !== 1 ? "s" : ""}`}
-          accent="var(--morning)"
-        />
-        <StatCard
-          icon={<Target size={20} />}
-          label="Follow-through"
-          value={`${stats.completion_rate}%`}
-          accent="var(--success)"
-        />
-        <StatCard
-          icon={<Heart size={20} />}
-          label="Avg Feeling"
-          value={stats.avg_feeling > 0 ? getFeelingLabel(stats.avg_feeling) : "—"}
-          accent="var(--accent)"
-        />
-        <StatCard
-          icon={<Calendar size={20} />}
-          label="Total Days"
-          value={`${stats.total_days}`}
-          accent="var(--evening)"
-        />
+      <div className="stats-bento">
+        <StreakCard streak={stats.current_streak} />
+        <RingCard value={stats.completion_rate} />
+        <MoodCard value={stats.avg_feeling} />
+        <CountCard value={stats.total_days} />
       </div>
 
       {feelingData.length > 2 && (
         <div className="chart-card">
           <div className="chart-header">
-            <Heart size={16} />
+            <Heart size={14} />
             <h3>Feeling over time</h3>
           </div>
-          <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={feelingData}>
+          <ResponsiveContainer width="100%" height={175}>
+            <AreaChart data={feelingData} margin={{ top: 4, right: 4, bottom: 0, left: -28 }}>
               <defs>
                 <linearGradient id="feelingGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#5b9cf6" stopOpacity={0.3} />
+                  <stop offset="5%"  stopColor="#5b9cf6" stopOpacity={0.22} />
                   <stop offset="95%" stopColor="#5b9cf6" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
-              <XAxis dataKey="date" tick={{ fill: "#5a5a66", fontSize: 11 }} tickLine={false} axisLine={false} />
-              <YAxis domain={[0, 100]} tick={{ fill: "#5a5a66", fontSize: 11 }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="date" tick={{ fill: "#44445a", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis domain={[1, 10]} ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} tick={{ fill: "#44445a", fontSize: 10 }} tickLine={false} axisLine={false} />
               <Tooltip
-                contentStyle={{ background: "#141416", border: "1px solid #2a2a2e", borderRadius: 8, fontSize: 13 }}
-                labelStyle={{ color: "#8a8a96" }}
-                formatter={(value: number) => [`${value}/100 — ${getFeelingLabel(value)}`, "Feeling"]}
+                contentStyle={{
+                  background: "rgba(10,13,20,0.95)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: 10,
+                  fontSize: 12,
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                }}
+                labelStyle={{ color: "#66667a", marginBottom: 4 }}
+                itemStyle={{ color: "#5b9cf6" }}
+                formatter={(v: number) => [`${v}/10 — ${getFeelingLabel(v)}`, ""]}
               />
-              <Area type="monotone" dataKey="feeling" stroke="#5b9cf6" fill="url(#feelingGrad)" strokeWidth={2} />
+              <Area
+                type="monotone"
+                dataKey="feeling"
+                stroke="#5b9cf6"
+                fill="url(#feelingGrad)"
+                strokeWidth={1.5}
+                dot={false}
+                activeDot={{ r: 4, fill: "#5b9cf6", strokeWidth: 0 }}
+              />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -114,22 +109,30 @@ export default function Dashboard() {
       {completionData.length > 2 && (
         <div className="chart-card">
           <div className="chart-header">
-            <TrendingUp size={16} />
-            <h3>Daily completion (last 30 days)</h3>
+            <TrendingUp size={14} />
+            <h3>Daily completion</h3>
           </div>
           <div className="heatmap">
             {completionData.map((d, i) => (
               <div
                 key={i}
-                className={`heatmap-cell ${d.completed === 1 ? "full" : d.completed === 0.5 ? "half" : "empty"}`}
-                title={`${d.date}: ${d.completed === 1 ? "Both check-ins" : d.completed === 0.5 ? "One check-in" : "No check-ins"}`}
+                className={`heatmap-cell ${
+                  d.completed === 1 ? "full" : d.completed === 0.5 ? "half" : "empty"
+                }`}
+                title={`${d.date}: ${
+                  d.completed === 1
+                    ? "Both check-ins"
+                    : d.completed === 0.5
+                    ? "One check-in"
+                    : "No check-ins"
+                }`}
               />
             ))}
           </div>
           <div className="heatmap-legend">
             <span className="legend-item"><span className="heatmap-cell empty" /> None</span>
-            <span className="legend-item"><span className="heatmap-cell half" /> Partial</span>
-            <span className="legend-item"><span className="heatmap-cell full" /> Complete</span>
+            <span className="legend-item"><span className="heatmap-cell half" />  Partial</span>
+            <span className="legend-item"><span className="heatmap-cell full" />  Complete</span>
           </div>
         </div>
       )}
@@ -137,28 +140,106 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({
-  icon,
-  label,
-  value,
-  accent,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  accent: string;
-}) {
+/* ── Streak ─────────────────────────────────────── */
+function StreakCard({ streak }: { streak: number }) {
   return (
-    <div className="stat-card">
-      <div className="stat-icon" style={{ color: accent, background: `${accent}18` }}>
-        {icon}
+    <div className="stat-card stat-streak">
+      <span className="stat-eyebrow">Current Streak</span>
+      <div className="streak-body">
+        <Flame size={38} className="streak-flame" />
+        <div className="streak-numeral">
+          <span className="streak-num">{streak}</span>
+          <span className="streak-unit">day{streak !== 1 ? "s" : ""}</span>
+        </div>
       </div>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{label}</div>
+      <p className="streak-note">
+        {streak > 0 ? "keep the momentum going" : "start your first check-in"}
+      </p>
+    </div>
+  );
+}
+
+/* ── Follow-through ring ─────────────────────────── */
+function RingCard({ value }: { value: number }) {
+  const r = 36;
+  const circ = 2 * Math.PI * r;
+  const filled = (value / 100) * circ;
+  return (
+    <div className="stat-card stat-ring">
+      <span className="stat-eyebrow">Follow-through</span>
+      <div className="ring-wrap">
+        <svg viewBox="0 0 100 100" className="ring-svg">
+          <circle
+            cx="50" cy="50" r={r}
+            fill="none"
+            stroke="rgba(255,255,255,0.05)"
+            strokeWidth="8"
+          />
+          <circle
+            cx="50" cy="50" r={r}
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="8"
+            strokeDasharray={`${filled} ${circ}`}
+            strokeLinecap="round"
+            transform="rotate(-90 50 50)"
+            style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.6))" }}
+          />
+        </svg>
+        <div className="ring-center">
+          <span className="ring-value">
+            {value}<span className="ring-pct">%</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Avg Feeling mood bar ───────────────────────── */
+function MoodCard({ value }: { value: number }) {
+  const label = getFeelingLabel(value);
+  const color = getFeelingColor(value);
+  return (
+    <div className="stat-card stat-mood">
+      <span className="stat-eyebrow">Avg Feeling</span>
+      <div className="mood-word" style={{ color }}>{label}</div>
+      <div className="mood-spectrum">
+        <div className="mood-spectrum-track" />
+        <div
+          className="mood-spectrum-dot"
+          style={{
+            left: `${((value - 1) / 9) * 100}%`,
+            background: color,
+            boxShadow: `0 0 10px ${color}`,
+          }}
+        />
+      </div>
+      <div className="mood-spectrum-labels">
+        <span>Drained</span>
+        <span>Energized</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Total Days ─────────────────────────────────── */
+function CountCard({ value }: { value: number }) {
+  return (
+    <div className="stat-card stat-count">
+      <span className="stat-eyebrow">Days Logged</span>
+      <div className="count-body">
+        <Calendar size={22} className="count-icon" />
+        <span className="count-num">{value}</span>
+      </div>
+      <p className="count-note">total check-in days</p>
     </div>
   );
 }
 
 function formatShort(dateStr: string) {
-  return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }

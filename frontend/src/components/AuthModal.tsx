@@ -2,11 +2,21 @@ import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { useAuth } from "../context/AuthContext";
 import { X, Mail, Lock, User } from "lucide-react";
+import PixelSnow from "./PixelSnow";
 
 interface AuthModalProps {
   onClose: () => void;
   initialMode?: "login" | "register";
 }
+
+const fieldVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.07, duration: 0.3, ease: "easeOut" }
+  })
+};
 
 export default function AuthModal({ onClose, initialMode = "login" }: AuthModalProps) {
   const [mode, setMode] = useState<"login" | "register">(initialMode);
@@ -57,16 +67,44 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
     onClose();
   };
 
+  const fieldOffset = mode === "register" ? 0 : 0;
+
   return (
     <motion.div
       className="modal-backdrop"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.2, ease: "easeInOut" }}
+      transition={{ duration: 0.25, ease: "easeInOut" }}
       onClick={handleClose}
     >
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <motion.div
+        className="modal-content"
+        initial={{ opacity: 0, scale: 0.96, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* PixelSnow lives inside the card, clipped by overflow: hidden */}
+        <div className="modal-snow-bg">
+          <PixelSnow
+            color="#7aa8f0"
+            flakeSize={0.009}
+            minFlakeSize={1.1}
+            pixelResolution={160}
+            speed={0.7}
+            density={0.18}
+            direction={118}
+            brightness={0.75}
+            depthFade={12}
+            farPlane={20}
+            gamma={0.4545}
+            variant="square"
+          />
+        </div>
+
+        <div className="modal-content-inner">
         <button className="modal-close" onClick={handleClose}>
           <X size={16} />
         </button>
@@ -83,9 +121,26 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
         </p>
 
         <form onSubmit={handleSubmit} className="auth-form">
-          {error && <div className="error-msg">{error}</div>}
+          {error && (
+            <motion.div
+              className="error-msg"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              transition={{ duration: 0.2 }}
+            >
+              {error}
+            </motion.div>
+          )}
+
           {mode === "register" && (
-            <div className="input-wrapper">
+            <motion.div
+              className="input-wrapper"
+              custom={fieldOffset}
+              variants={fieldVariants}
+              initial="hidden"
+              animate="visible"
+              key="name-field"
+            >
               <User size={14} className="input-icon" />
               <input
                 type="text"
@@ -96,9 +151,17 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
                 autoFocus
                 className="input-with-icon"
               />
-            </div>
+            </motion.div>
           )}
-          <div className="input-wrapper">
+
+          <motion.div
+            className="input-wrapper"
+            custom={mode === "register" ? 1 : 0}
+            variants={fieldVariants}
+            initial="hidden"
+            animate="visible"
+            key={`email-${mode}`}
+          >
             <Mail size={14} className="input-icon" />
             <input
               type="email"
@@ -109,8 +172,16 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
               autoFocus={mode === "login"}
               className="input-with-icon"
             />
-          </div>
-          <div className="input-wrapper">
+          </motion.div>
+
+          <motion.div
+            className="input-wrapper"
+            custom={mode === "register" ? 2 : 1}
+            variants={fieldVariants}
+            initial="hidden"
+            animate="visible"
+            key={`password-${mode}`}
+          >
             <Lock size={14} className="input-icon" />
             <input
               type="password"
@@ -121,12 +192,22 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
               minLength={mode === "register" ? 6 : undefined}
               className="input-with-icon"
             />
-          </div>
-          <button type="submit" disabled={loading} className="btn-modal-submit">
+          </motion.div>
+
+          <motion.button
+            type="submit"
+            disabled={loading}
+            className="btn-modal-submit"
+            custom={mode === "register" ? 3 : 2}
+            variants={fieldVariants}
+            initial="hidden"
+            animate="visible"
+            whileTap={!loading ? { scale: 0.98 } : undefined}
+          >
             {loading
               ? mode === "login" ? "Signing in..." : "Creating account..."
               : mode === "login" ? "Sign in" : "Create account"}
-          </button>
+          </motion.button>
         </form>
 
         <p className="modal-footer-text">
@@ -135,7 +216,8 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
             {mode === "login" ? "Sign up" : "Sign in"}
           </button>
         </p>
-      </div>
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

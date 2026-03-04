@@ -14,7 +14,7 @@ class AiService
 
     parsed = JSON.parse(response)
     {
-      ai_summary: parsed["insight"],
+      ai_summary: format_daily_plan(parsed),
       tasks_planned: parsed["tasks_planned"] || 0,
       tasks_completed: parsed["tasks_completed"] || 0,
       carry_overs: parsed["carry_overs"]
@@ -36,8 +36,8 @@ class AiService
 
     return nil if recent_checkins.size < 3
 
-    prompt = build_nudge_prompt(recent_checkins, current_checkin)
     name = user.name
+    prompt = build_nudge_prompt(recent_checkins, current_checkin, name)
     response = chat(prompt, system: "You are a blunt, slightly quirky coach talking to #{name}. Speak in second person (you/your), be specific and honest, and let your personality show with things like :) or a dry observation. No sugarcoating, no generic advice, no em dashes. Respond in JSON only.")
 
     parsed = JSON.parse(response)
@@ -82,29 +82,37 @@ class AiService
     person = name || "this person"
     parts = []
     if morning
-      parts << "Morning standup (feeling: #{morning.feeling || 'not set'}/100):"
+      parts << "Morning standup (feeling: #{morning.feeling || 'not set'}/10):"
       parts << "  Yesterday: #{morning.yesterday}" if morning.yesterday.present?
       parts << "  Plan for today: #{morning.today_plan}" if morning.today_plan.present?
       parts << "  Blockers: #{morning.blockers}" if morning.blockers.present?
     end
     if evening
-      parts << "Evening reflection (feeling: #{evening.feeling || 'not set'}/100):"
+      parts << "Evening reflection (feeling: #{evening.feeling || 'not set'}/10):"
       parts << "  What happened: #{evening.what_happened}" if evening.what_happened.present?
       parts << "  Carrying over: #{evening.carry_over}" if evening.carry_over.present?
     end
 
     <<~PROMPT
       Here is #{person}'s standup for today. Return a JSON object with:
-      - "insight": 1-2 sentences addressed directly to them (use "you"/"your"). Don't summarize — call out something real: a gap between their plan and reality, a pattern, a win, or a blocker that's getting in their way. Be blunt and specific.
+      - "diagnosis": one blunt sentence (max 20 words) about the most important reality today
+      - "priority": one specific thing they should prioritize in the next 2-4 hours
+      - "first_step": one tiny concrete step they can do in 5-10 minutes to start that priority
+      - "if_then": one fallback rule in this format: "If X happens, then do Y."
       - "tasks_planned": estimated number of tasks they planned (integer)
       - "tasks_completed": estimated number completed based on evening check-in (integer)
       - "carry_overs": brief note on what didn't get done, or null if everything was completed
+
+      Rules:
+      - Don't just paraphrase their words.
+      - Be specific enough that they can act immediately.
+      - Keep each field concise and direct.
 
       #{parts.join("\n")}
     PROMPT
   end
 
-  def self.build_nudge_prompt(recent_checkins, current_checkin)
+  def self.build_nudge_prompt(recent_checkins, current_checkin, user_name = nil)
     history = recent_checkins.map do |c|
       if c.morning?
         line = "#{c.date} morning (feeling: #{c.feeling || '?'}): plan=#{c.today_plan}"
@@ -129,7 +137,7 @@ class AiService
     end
 
     <<~PROMPT
-      Here's #{user.name}'s standup history for the last 2 weeks and their check-in today. Spot a NON-OBVIOUS pattern and call it out directly.
+      Here's #{user_name || 'this person'}'s standup history for the last 2 weeks and their check-in today. Spot a NON-OBVIOUS pattern and call it out directly.
 
       Return a JSON object with:
       - "nudge": One blunt sentence (max 25 words) addressed directly to them using "you". Surface something they likely haven't noticed — recurring blockers, feeling trends, forgotten goals, day-of-week dips, plan-vs-reality gaps. If there's genuinely nothing worth saying, return "nudge": null.
@@ -148,6 +156,20 @@ class AiService
     PROMPT
   end
 
+  def self.format_daily_plan(parsed)
+    diagnosis = parsed["diagnosis"].presence || parsed["insight"].presence || "Your day needs a clearer main target."
+    priority = parsed["priority"].presence || "Choose one meaningful task and protect time for it."
+    first_step = parsed["first_step"].presence || "Write the first tiny action and start a 10-minute timer."
+    if_then = parsed["if_then"].presence || "If you get distracted, then do just the first 5 minutes."
+
+    [
+      "Reality check: #{diagnosis}",
+      "Focus now: #{priority}",
+      "First step: #{first_step}",
+      "Fallback: #{if_then}"
+    ].join("\n")
+  end
+
   def self.build_weekly_prompt(checkins, summaries)
     days = checkins.group_by(&:date).sort_by(&:first).map do |date, day_checkins|
       morning = day_checkins.find(&:morning?)
@@ -156,13 +178,13 @@ class AiService
 
       day_str = "## #{date} (#{date.strftime('%A')})\n"
       if morning
-        day_str += "Morning (feeling #{morning.feeling || '?'}/100): plan=#{morning.today_plan}"
+        day_str += "Morning (feeling #{morning.feeling || '?'}/10): plan=#{morning.today_plan}"
         day_str += ", blockers=#{morning.blockers}" if morning.blockers.present?
         day_str += ", yesterday=#{morning.yesterday}" if morning.yesterday.present?
         day_str += "\n"
       end
       if evening
-        day_str += "Evening (feeling #{evening.feeling || '?'}/100): happened=#{evening.what_happened}"
+        day_str += "Evening (feeling #{evening.feeling || '?'}/10): happened=#{evening.what_happened}"
         day_str += ", carry_over=#{evening.carry_over}" if evening.carry_over.present?
         day_str += "\n"
       end

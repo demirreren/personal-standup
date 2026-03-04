@@ -1,0 +1,71 @@
+.animated-list-container {
+  position: relative;
+}
+
+.animated-list-scroll {
+  max-height: 560px;
+  overflow-y: auto;
+  padding: 4px 2px 16px;
+  outline: none;
+}
+
+.animated-list-scroll:focus-visible {
+  box-shadow: 0 0 0 2px rgba(91, 156, 246, 0.35);
+  border-radius: var(--radius-sm);
+}
+
+.animated-list-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.animated-list-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.animated-list-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 160, 184, 0.3);
+  border-radius: 4px;
+}
+
+.animated-list-scroll.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.animated-list-scroll.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.animated-list-item-wrap {
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.animated-list-item {
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.animated-list-item.selected {
+  transform: translateX(2px);
+}
+
+.animated-list-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.animated-list-gradient.top {
+  top: 0;
+  height: 42px;
+  background: linear-gradient(to bottom, rgba(10, 13, 20, 0.95), transparent);
+}
+
+.animated-list-gradient.bottom {
+  bottom: 0;
+  height: 68px;
+  background: linear-gradient(to top, rgba(10, 13, 20, 0.95), transparent);
+}

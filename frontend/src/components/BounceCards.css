@@ -1,0 +1,126 @@
+.bounceCardsContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bounce-card {
+  position: absolute;
+  width: 270px;
+  height: 370px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 20px 20px;
+  gap: 14px;
+
+  /* Glass base */
+  background: linear-gradient(
+    150deg,
+    rgba(255, 255, 255, 0.07) 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    rgba(10, 13, 24, 0.55) 100%
+  );
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+
+  /* Borders: colored accent top, subtle white sides */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2.5px solid var(--card-accent, rgba(91, 156, 246, 0.85));
+
+  /* Layered shadows: depth + inner highlight */
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.55),
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* Glossy sheen sweep across the top */
+.bounce-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.09) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+.bounce-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  border-top-color: var(--card-accent, rgba(91, 156, 246, 0.85));
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.65),
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 0 40px color-mix(in srgb, var(--card-accent, rgba(91, 156, 246, 0.8)) 22%, transparent);
+  z-index: 10;
+}
+
+.bounce-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.bounce-card-icon {
+  font-size: 18px;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--card-accent) 50%, transparent));
+}
+
+.bounce-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--card-accent, rgba(91, 156, 246, 0.9));
+  text-shadow: 0 0 12px color-mix(in srgb, var(--card-accent) 40%, transparent);
+}
+
+/* Thin separator below header */
+.bounce-card-header::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    var(--card-accent, rgba(91, 156, 246, 0.4)) 0%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+}
+
+.bounce-card-content {
+  font-size: 13.5px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.75);
+  overflow-y: auto;
+  flex: 1;
+  margin: 4px 0 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+  position: relative;
+}
+
+.bounce-card-content::-webkit-scrollbar {
+  width: 3px;
+}
+.bounce-card-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}

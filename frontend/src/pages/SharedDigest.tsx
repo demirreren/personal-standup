@@ -58,7 +58,7 @@ export default function SharedDigest() {
           {digest.avg_energy != null && (
             <div className="metric">
               <Heart size={14} />
-              <span>Avg feeling: {digest.avg_energy}/100</span>
+              <span>Avg feeling: {digest.avg_energy}/10</span>
             </div>
           )}
           {digest.completion_rate != null && (

@@ -3,30 +3,27 @@ import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
-import { api, type Checkin, type DailySummary } from "../lib/api";
-import {
-  Sun, Moon, Send, Check, Zap, Loader, Sparkles,
-  ArrowRight, RotateCcw, X,
-} from "lucide-react";
-import MetaBalls from "../components/MetaBalls";
-import StarBorder from "../components/StarBorder";
+import { api, type Checkin } from "../lib/api";
+import { ArrowRight, Send, Check } from "lucide-react";
 
 const LAYOUT_SPRING = { type: "spring" as const, stiffness: 75, damping: 18, mass: 1.1 };
 
 function getFeelingLabel(value: number): string {
-  if (value <= 15) return "Drained";
-  if (value <= 35) return "Low";
-  if (value <= 55) return "Okay";
-  if (value <= 75) return "Good";
-  if (value <= 90) return "Great";
+  if (value <= 2) return "Drained";
+  if (value <= 4) return "Low";
+  if (value <= 6) return "Okay";
+  if (value <= 8) return "Good";
+  if (value === 9) return "Great";
   return "Energized";
 }
 
 function getFeelingColor(value: number): string {
-  if (value <= 25) return "#ef4444";
-  if (value <= 50) return "#f59e0b";
-  if (value <= 75) return "#5b9cf6";
-  return "#10b981";
+  const hue = Math.round(((value - 1) / 9) * 120);
+  return `hsl(${hue}, 52%, 52%)`;
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 }
 
 function getSignedOutGreeting() {
@@ -49,18 +46,15 @@ export default function Today() {
 
   const [morning, setMorning] = useState<Checkin | null>(null);
   const [evening, setEvening] = useState<Checkin | null>(null);
-  const [checkinsLoading, setCheckinsLoading] = useState(false);
-  const [summary, setSummary] = useState<DailySummary | null>(null);
-  const [generatingSummary, setGeneratingSummary] = useState(false);
 
   // Morning form state
-  const [mFeeling, setMFeeling] = useState(50);
+  const [mFeeling, setMFeeling] = useState(5);
   const [mYesterday, setMYesterday] = useState("");
   const [mTodayPlan, setMTodayPlan] = useState("");
   const [mBlockers, setMBlockers] = useState("");
 
   // Evening form state
-  const [eFeeling, setEFeeling] = useState(50);
+  const [eFeeling, setEFeeling] = useState(5);
   const [eWhatHappened, setEWhatHappened] = useState("");
   const [eCarryOver, setECarryOver] = useState("");
 
@@ -80,13 +74,11 @@ export default function Today() {
 
   useEffect(() => {
     if (!user) return;
-    setCheckinsLoading(true);
     api.checkins.today().then(({ morning: m, evening: e }) => {
       setMorning(m);
       setEvening(e);
       if (m) setMorningFlipped(true);
       if (e) setEveningFlipped(true);
-      setCheckinsLoading(false);
     });
   }, [user?.id]);
 
@@ -209,7 +201,7 @@ export default function Today() {
                   >
                     <div className="peek-card-body morning">
                       <div className="peek-card-overlay">
-                        <span className="peek-card-label morning-label">☀️ Morning Standup</span>
+                        <span className="peek-card-label morning-label">Morning Standup</span>
                       </div>
                     </div>
                   </motion.div>
@@ -230,7 +222,7 @@ export default function Today() {
                   >
                     <div className="peek-card-body evening">
                       <div className="peek-card-overlay">
-                        <span className="peek-card-label evening-label">🌙 Evening Reflection</span>
+                        <span className="peek-card-label evening-label">Evening Reflection</span>
                       </div>
                     </div>
                   </motion.div>
@@ -272,6 +264,7 @@ export default function Today() {
             </motion.header>
 
             <>
+              <DayProgress morning={!!morning} evening={!!evening} />
               <div className="standup-stage">
               <div className="standup-flip-cards">
                 {/* ---- MORNING CARD ---- */}
@@ -287,15 +280,12 @@ export default function Today() {
                     <div className="standup-flip-card-front morning">
                       <div className="flip-card-overlay morning-overlay">
                         <div className="flip-card-top-row">
-                          {morning ? (
-                            <div className="flip-completed-badge"><Check size={12} /> Done</div>
-                          ) : (
-                            <div className="flip-icon-btn"><RotateCcw size={15} /></div>
+                          {morning && (
+                            <div className="flip-completed-badge">Completed</div>
                           )}
                         </div>
                         <div className="flip-card-front-bottom">
                           <div className="flip-card-title-row">
-                            <Sun size={22} className="flip-card-icon-morning" />
                             <h3>Morning Standup</h3>
                           </div>
                           {!morning && <p className="flip-card-open-hint">Click to open</p>}
@@ -308,16 +298,18 @@ export default function Today() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flip-back-header">
-                        <Sun size={18} className="flip-card-icon-morning" />
                         <h3>Morning Standup</h3>
                         {morning ? (
-                          <Check size={16} className="check-icon" />
+                          <span className="check-state-text">
+                            <Check size={12} strokeWidth={2.5} />
+                            {morning.created_at ? formatTime(morning.created_at) : "Done"}
+                          </span>
                         ) : (
                           <button
                             className="flip-back-close"
                             onClick={() => setMorningFlipped(false)}
                           >
-                            <X size={13} />
+                            Close
                           </button>
                         )}
                       </div>
@@ -376,9 +368,10 @@ export default function Today() {
                             <button
                               type="submit"
                               disabled={submitting || !mTodayPlan.trim()}
-                              className="btn-primary btn-sm"
+                              className="btn-checkin"
                             >
-                              <Send size={14} /><span>Check in</span>
+                              <Send size={13} strokeWidth={2} />
+                              Check in
                             </button>
                           </div>
                         </form>
@@ -386,22 +379,6 @@ export default function Today() {
                     </div>
                   </div>
                 </motion.div>
-
-                {/* ---- METABALLS CONNECTOR ---- */}
-                <div className="cards-connector" aria-hidden="true">
-                  <MetaBalls
-                    color="#5b9cf6"
-                    cursorBallColor="#7eb8ff"
-                    cursorBallSize={2}
-                    ballCount={15}
-                    animationSize={30}
-                    enableMouseInteraction
-                    enableTransparency={true}
-                    hoverSmoothness={0.15}
-                    clumpFactor={1}
-                    speed={0.3}
-                  />
-                </div>
 
                 {/* ---- EVENING CARD ---- */}
                 <motion.div
@@ -416,15 +393,12 @@ export default function Today() {
                     <div className="standup-flip-card-front evening">
                       <div className="flip-card-overlay evening-overlay">
                         <div className="flip-card-top-row">
-                          {evening ? (
-                            <div className="flip-completed-badge"><Check size={12} /> Done</div>
-                          ) : (
-                            <div className="flip-icon-btn"><RotateCcw size={15} /></div>
+                          {evening && (
+                            <div className="flip-completed-badge">Completed</div>
                           )}
                         </div>
                         <div className="flip-card-front-bottom">
                           <div className="flip-card-title-row">
-                            <Moon size={22} className="flip-card-icon-evening" />
                             <h3>Evening Reflection</h3>
                           </div>
                           {!evening && <p className="flip-card-open-hint">Click to open</p>}
@@ -437,16 +411,18 @@ export default function Today() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="flip-back-header">
-                        <Moon size={18} className="flip-card-icon-evening" />
                         <h3>Evening Reflection</h3>
                         {evening ? (
-                          <Check size={16} className="check-icon" />
+                          <span className="check-state-text">
+                            <Check size={12} strokeWidth={2.5} />
+                            {evening.created_at ? formatTime(evening.created_at) : "Done"}
+                          </span>
                         ) : (
                           <button
                             className="flip-back-close"
                             onClick={() => setEveningFlipped(false)}
                           >
-                            <X size={13} />
+                            Close
                           </button>
                         )}
                       </div>
@@ -492,9 +468,10 @@ export default function Today() {
                             <button
                               type="submit"
                               disabled={submitting || !eWhatHappened.trim()}
-                              className="btn-primary btn-sm"
+                              className="btn-checkin"
                             >
-                              <Send size={14} /><span>Check out</span>
+                              <Send size={13} strokeWidth={2} />
+                              Check out
                             </button>
                           </div>
                         </form>
@@ -512,7 +489,6 @@ export default function Today() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <Check size={24} />
                   <p>You've completed both check-ins today. Nice work.</p>
                 </motion.div>
               )}
@@ -526,81 +502,14 @@ export default function Today() {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ delay: 0.3, duration: 0.4 }}
                   >
-                    <div className="nudge-icon-badge">
-                      <Zap size={15} />
-                    </div>
                     <p>{nudge}</p>
                     <button className="nudge-dismiss" onClick={() => setNudge(null)}>
-                      <X size={12} />
+                      Dismiss
                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {(morning || evening) && !nudge && (
-                <motion.div
-                  className="summary-section"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.4 }}
-                >
-                  <AnimatePresence mode="wait">
-                    {summary ? (
-                      <motion.div
-                        key="summary-card"
-                        className="summary-card"
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-                      >
-                        <div className="summary-header">
-                          <Zap size={18} />
-                          <h3>Today's Read</h3>
-                        </div>
-                        <p className="summary-text">{summary.ai_summary}</p>
-                        {summary.carry_overs && (
-                          <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
-                        )}
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="generate-pill"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.88 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <StarBorder
-                          as="button"
-                          className="generate-star-btn"
-                          color="#5b9cf6"
-                          speed="5s"
-                          onClick={async () => {
-                            setGeneratingSummary(true);
-                            try {
-                              const { daily_summary } = await api.summaries.generate();
-                              setSummary(daily_summary);
-                              if (daily_summary.ai_summary) {
-                                setNudge(daily_summary.ai_summary);
-                              }
-                            } catch (err: unknown) {
-                              alert((err as Error).message);
-                            } finally {
-                              setGeneratingSummary(false);
-                            }
-                          }}
-                          disabled={generatingSummary}
-                        >
-                          {generatingSummary
-                            ? <Loader size={13} className="spin" />
-                            : <Sparkles size={13} />}
-                          {generatingSummary ? "Generating…" : "Get today's read"}
-                        </StarBorder>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
             </>
           </motion.div>
         )}
@@ -654,49 +563,60 @@ function FeelingSlider({
   value: number;
   onChange: (v: number) => void;
 }) {
+  const color = getFeelingColor(value);
   return (
-    <div className="feeling-slider">
-      <div className="feeling-slider-header">
+    <div className="feeling-picker">
+      <div className="feeling-picker-header">
         <span className="feeling-label">How are you feeling?</span>
-        <span
-          className="feeling-value"
-          style={{ color: getFeelingColor(value) }}
-        >
+        <span className="feeling-value" style={{ color }}>
           {getFeelingLabel(value)}
         </span>
       </div>
-      <div className="feeling-track-wrapper">
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={value}
-          onChange={(e) => onChange(Number(e.target.value))}
-          className="feeling-range"
-          style={{
-            background: `linear-gradient(to right, ${getFeelingColor(value)} ${value}%, rgba(255,255,255,0.08) ${value}%)`,
-          }}
-        />
-        <div className="feeling-track-labels">
-          <span>Drained</span>
-          <span>Energized</span>
-        </div>
+      <div className="feeling-picker-buttons">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => {
+          const btnColor = getFeelingColor(n);
+          const selected = value === n;
+          return (
+            <button
+              key={n}
+              type="button"
+              className={`feeling-btn${selected ? " feeling-btn--selected" : ""}`}
+              style={selected ? { background: btnColor, borderColor: btnColor, color: "#fff" } : {}}
+              onClick={() => onChange(n)}
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
+      <div className="feeling-picker-labels">
+        <span>Drained</span>
+        <span>Energized</span>
       </div>
     </div>
   );
 }
 
 function FeelingDisplay({ value }: { value: number }) {
+  const color = getFeelingColor(value);
   return (
     <div className="feeling-display">
-      <div
-        className="feeling-dot"
-        style={{ background: getFeelingColor(value) }}
-      />
-      <span style={{ color: getFeelingColor(value) }}>
-        {getFeelingLabel(value)}
+      <span className="feeling-dot" style={{ background: color }} />
+      <span style={{ color }}>{getFeelingLabel(value)}</span>
+      <span className="feeling-display-value">{value}/10</span>
+    </div>
+  );
+}
+
+function DayProgress({ morning, evening }: { morning: boolean; evening: boolean }) {
+  const count = (morning ? 1 : 0) + (evening ? 1 : 0);
+  return (
+    <div className="day-progress">
+      <div className={`day-progress-pip ${morning ? "done" : ""}`} />
+      <div className={`day-progress-pip ${evening ? "done" : ""}`} />
+      <span className="day-progress-label">
+        {count === 0 ? "No check-ins yet" : count === 1 ? "1 of 2 done" : "Both done"}
       </span>
-      <span className="feeling-display-value">{value}/100</span>
     </div>
   );
 }
