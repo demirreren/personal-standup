@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { api, type Checkin } from "../lib/api";
-import { Sun, Moon, Zap, Send, Check } from "lucide-react";
+import { api, type Checkin, type DailySummary } from "../lib/api";
+import { Sun, Moon, Zap, Send, Check, Sparkles, Loader } from "lucide-react";
 
 const ENERGY_LABELS = ["", "Drained", "Low", "Okay", "Good", "Fired up"];
 
@@ -9,6 +9,8 @@ export default function Today() {
   const [evening, setEvening] = useState<Checkin | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [summary, setSummary] = useState<DailySummary | null>(null);
+  const [generatingSummary, setGeneratingSummary] = useState(false);
   const [morningBody, setMorningBody] = useState("");
   const [morningEnergy, setMorningEnergy] = useState<number | null>(null);
   const [eveningBody, setEveningBody] = useState("");
@@ -161,6 +163,42 @@ export default function Today() {
         <div className="day-complete">
           <Check size={24} />
           <p>You've completed both check-ins today. Nice work.</p>
+        </div>
+      )}
+
+      {(morning || evening) && (
+        <div className="summary-section">
+          {summary ? (
+            <div className="summary-card">
+              <div className="summary-header">
+                <Sparkles size={18} />
+                <h3>AI Daily Summary</h3>
+              </div>
+              <p className="summary-text">{summary.ai_summary}</p>
+              {summary.carry_overs && (
+                <p className="carry-overs">Carrying over: {summary.carry_overs}</p>
+              )}
+            </div>
+          ) : (
+            <button
+              className="btn-ghost generate-btn"
+              onClick={async () => {
+                setGeneratingSummary(true);
+                try {
+                  const { daily_summary } = await api.summaries.generate();
+                  setSummary(daily_summary);
+                } catch (err: any) {
+                  alert(err.message);
+                } finally {
+                  setGeneratingSummary(false);
+                }
+              }}
+              disabled={generatingSummary}
+            >
+              {generatingSummary ? <Loader size={14} className="spin" /> : <Sparkles size={14} />}
+              {generatingSummary ? "Generating..." : "Generate AI summary"}
+            </button>
+          )}
         </div>
       )}
     </div>
