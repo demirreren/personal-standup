@@ -14,7 +14,7 @@ module Api
             Date.parse(params[:end_date])
           )
         else
-          checkins = checkins.where(date: 30.days.ago.to_date..Date.today)
+          checkins = checkins.where(date: 30.days.ago.to_date..current_date)
         end
 
         render json: { checkins: checkins.recent.map { |c| checkin_json(c) } }
@@ -22,7 +22,7 @@ module Api
 
       def create
         checkin = current_user.checkins.new(checkin_params)
-        checkin.date ||= Date.today
+        checkin.date ||= current_date
 
         if checkin.save
           render json: { checkin: checkin_json(checkin) }, status: :created
@@ -41,7 +41,7 @@ module Api
       end
 
       def today
-        today_checkins = current_user.checkins.for_date(Date.today)
+        today_checkins = current_user.checkins.for_date(current_date)
         render json: {
           morning: today_checkins.mornings.first&.then { |c| checkin_json(c) },
           evening: today_checkins.evenings.first&.then { |c| checkin_json(c) }

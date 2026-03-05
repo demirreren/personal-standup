@@ -20,7 +20,7 @@ module Api
         week_start = if params[:week]
           Date.parse(params[:week]).beginning_of_week(:monday)
         else
-          Date.today.beginning_of_week(:monday)
+          current_date.beginning_of_week(:monday)
         end
         week_end = week_start + 6.days
 

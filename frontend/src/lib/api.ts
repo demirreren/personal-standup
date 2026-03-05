@@ -1,5 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+function getBrowserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return "UTC";
+  }
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = localStorage.getItem("token");
 
@@ -7,6 +15,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     headers: {
       "Content-Type": "application/json",
+      "X-Timezone": getBrowserTimezone(),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -29,7 +38,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const api = {
   auth: {
     register: (data: { name: string; email: string; password: string; password_confirmation: string }) =>
-      request<{ user: User; token: string }>("/api/v1/auth/register", { method: "POST", body: JSON.stringify(data) }),
+      request<{ user: User; token: string }>("/api/v1/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ ...data, timezone: getBrowserTimezone() }),
+      }),
     login: (data: { email: string; password: string }) =>
       request<{ user: User; token: string }>("/api/v1/auth/login", { method: "POST", body: JSON.stringify(data) }),
     me: () => request<{ user: User }>("/api/v1/auth/me"),

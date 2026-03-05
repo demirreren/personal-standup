@@ -127,13 +127,12 @@ export default function BounceCards({
           className={`bounce-card bounce-card-${idx}`}
           style={{
             transform: transformStyles[idx] ?? 'none',
-            '--card-accent': card.accent,
+            '--card-accent-left': card.accent,
           } as React.CSSProperties}
           onMouseEnter={() => pushSiblings(idx)}
           onMouseLeave={resetSiblings}
         >
           <div className="bounce-card-header">
-            <span className="bounce-card-icon">{card.icon}</span>
             <span className="bounce-card-label">{card.label}</span>
           </div>
           <p className="bounce-card-content">{card.content}</p>

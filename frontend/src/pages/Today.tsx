@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
 import { api, type Checkin } from "../lib/api";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, Send } from "lucide-react";
 import TiltedCard from "../components/TiltedCard";
 
 const LAYOUT_SPRING = { type: "spring" as const, stiffness: 75, damping: 18, mass: 1.1 };
@@ -468,6 +468,7 @@ export default function Today() {
                               className="btn-checkin"
                             >
                               Check In
+                              <Send size={11} strokeWidth={1.8} />
                             </button>
                           </div>
                         </form>
@@ -598,6 +599,7 @@ export default function Today() {
                               className="btn-checkin"
                             >
                               Check Out
+                              <Send size={11} strokeWidth={1.8} />
                             </button>
                           </div>
                         </form>
@@ -779,7 +781,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 1, label: "Drained",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <path d="M4 9.5C4 7 5.8 5.5 9 5.5s5 1.5 5 4H4z" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
         <line x1="6.2" y1="11" x2="5.5" y2="14" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
         <line x1="9" y1="11.5" x2="8.5" y2="14.5" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
@@ -790,7 +792,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 2, label: "Low",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <path d="M13 3.5A5.5 5.5 0 1 0 13 14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
       </svg>
     ),
@@ -798,7 +800,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 4, label: "Meh",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <path d="M2 7.5C4.5 5.8 6.5 9.5 9 7.5 11.5 5.5 13.5 9.5 16 7.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
         <line x1="3" y1="11.5" x2="15" y2="11.5" stroke="currentColor" strokeWidth="0.7" strokeLinecap="round" strokeOpacity="0.35"/>
       </svg>
@@ -807,7 +809,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 5, label: "Okay",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <line x1="3" y1="9" x2="15" y2="9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
       </svg>
     ),
@@ -815,7 +817,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 7, label: "Good",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <line x1="9" y1="15" x2="9" y2="7" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
         <path d="M9 11C9 11 6 9 5 6.5 7.5 5.5 9 8 9 11z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
         <path d="M9 13C9 13 12 11 13 8.5 10.5 7.5 9 10 9 13z" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
@@ -825,7 +827,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 9, label: "Great",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <circle cx="9" cy="9" r="2.8" stroke="currentColor" strokeWidth="1.1"/>
         <line x1="9" y1="2" x2="9" y2="4" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
         <line x1="9" y1="14" x2="9" y2="16" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round"/>
@@ -841,7 +843,7 @@ const MOOD_GLYPHS: Array<{ value: number; label: string; glyph: React.ReactNode 
   {
     value: 10, label: "Energized",
     glyph: (
-      <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+      <svg width="22" height="22" viewBox="0 0 18 18" fill="none">
         <path d="M9 15.5C6.5 15.5 4 13.5 4 10.5 4 8 5.5 6.5 6.5 5 6.5 7 7.5 8 9 8 9 6 10.5 3.5 11.5 2.5 11.5 5 13.5 7.5 13.5 10.5 13.5 13.5 11.5 15.5 9 15.5z" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
@@ -855,10 +857,13 @@ function MoodGlyphs({
   value: number;
   onChange: (v: number) => void;
 }) {
+
   return (
     <div className="mood-glyphs-wrap">
+      {/* Arrow rail — sits above the icons */}
+      <div className="mood-glyphs-rail" aria-hidden="true" />
+      {/* Icons hang below the rail */}
       <div className="mood-glyphs-row">
-        <div className="mood-glyphs-line" />
         {MOOD_GLYPHS.map((g) => (
           <button
             key={g.value}
@@ -867,8 +872,10 @@ function MoodGlyphs({
             onClick={() => onChange(g.value)}
             aria-label={g.label}
           >
+            {value === g.value && (
+              <span className="mood-glyph-active-label">{g.label}</span>
+            )}
             {g.glyph}
-            <span className="mood-glyph-tooltip">{g.label}</span>
           </button>
         ))}
       </div>

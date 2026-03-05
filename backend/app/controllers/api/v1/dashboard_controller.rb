@@ -5,7 +5,7 @@ module Api
 
       def stats
         checkins = current_user.checkins
-        today = Date.today
+        today = current_date
 
         current_streak = calculate_streak(checkins, today)
         total_days = checkins.select(:date).distinct.count
@@ -32,7 +32,7 @@ module Api
       def trends
         days = (params[:days] || 30).to_i
         start_date = days.days.ago.to_date
-        checkins = current_user.checkins.for_range(start_date, Date.today)
+        checkins = current_user.checkins.for_range(start_date, current_date)
 
         feeling_by_day = checkins.where.not(feeling: nil)
           .group(:date)
@@ -41,7 +41,7 @@ module Api
 
         checkins_by_day = checkins.group(:date, :checkin_type).count
 
-        daily_data = (start_date..Date.today).map do |date|
+        daily_data = (start_date..current_date).map do |date|
           morning = checkins_by_day[[date, "morning"]] || 0
           evening = checkins_by_day[[date, "evening"]] || 0
           {

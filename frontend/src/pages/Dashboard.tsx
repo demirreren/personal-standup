@@ -74,8 +74,8 @@ export default function Dashboard() {
             <AreaChart data={feelingData} margin={{ top: 4, right: 4, bottom: 0, left: -28 }}>
               <defs>
                 <linearGradient id="feelingGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#5b9cf6" stopOpacity={0.22} />
-                  <stop offset="95%" stopColor="#5b9cf6" stopOpacity={0} />
+                  <stop offset="5%"  stopColor="#4a7cf7" stopOpacity={0.22} />
+                  <stop offset="95%" stopColor="#4a7cf7" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis dataKey="date" tick={{ fill: "#44445a", fontSize: 10 }} tickLine={false} axisLine={false} />
@@ -89,17 +89,17 @@ export default function Dashboard() {
                   boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
                 }}
                 labelStyle={{ color: "#66667a", marginBottom: 4 }}
-                itemStyle={{ color: "#5b9cf6" }}
+                itemStyle={{ color: "#4a7cf7" }}
                 formatter={(v: number) => [`${v}/10 — ${getFeelingLabel(v)}`, ""]}
               />
               <Area
                 type="monotone"
                 dataKey="feeling"
-                stroke="#5b9cf6"
+                stroke="#4a7cf7"
                 fill="url(#feelingGrad)"
                 strokeWidth={1.5}
                 dot={false}
-                activeDot={{ r: 4, fill: "#5b9cf6", strokeWidth: 0 }}
+                activeDot={{ r: 4, fill: "#4a7cf7", strokeWidth: 0 }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -172,18 +172,18 @@ function RingCard({ value }: { value: number }) {
           <circle
             cx="50" cy="50" r={r}
             fill="none"
-            stroke="rgba(255,255,255,0.05)"
+            stroke="#1e1c2e"
             strokeWidth="8"
           />
           <circle
             cx="50" cy="50" r={r}
             fill="none"
-            stroke="#10b981"
+            stroke="#4a7cf7"
             strokeWidth="8"
             strokeDasharray={`${filled} ${circ}`}
             strokeLinecap="round"
             transform="rotate(-90 50 50)"
-            style={{ filter: "drop-shadow(0 0 5px rgba(16,185,129,0.6))" }}
+            style={{ filter: "drop-shadow(0 0 5px rgba(74,124,247,0.5))" }}
           />
         </svg>
         <div className="ring-center">

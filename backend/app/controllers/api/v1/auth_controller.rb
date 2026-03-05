@@ -16,8 +16,18 @@ module Api
         user = User.find_by(email: params[:email]&.downcase&.strip)
 
         if user&.authenticate(params[:password])
+          tz = request.headers["X-Timezone"]
+          if tz.present? && tz != user.timezone
+            begin
+              Time.use_zone(tz) { nil }
+              user.update_column(:timezone, tz)
+            rescue ArgumentError
+              # invalid timezone, ignore
+            end
+          end
+
           token = JwtService.encode(user.id)
-          render json: { user: user_json(user), token: token }
+          render json: { user: user_json(user.reload), token: token }
         else
           render json: { error: "Invalid email or password" }, status: :unauthorized
         end

@@ -14,14 +14,14 @@ module Api
             Date.parse(params[:end_date])
           )
         else
-          summaries = summaries.where(date: 30.days.ago.to_date..Date.today)
+          summaries = summaries.where(date: 30.days.ago.to_date..current_date)
         end
 
         render json: { daily_summaries: summaries.recent.map { |s| summary_json(s) } }
       end
 
       def generate
-        date = params[:date] ? Date.parse(params[:date]) : Date.today
+        date = params[:date] ? Date.parse(params[:date]) : current_date
         checkins = current_user.checkins.for_date(date)
 
         if checkins.empty?

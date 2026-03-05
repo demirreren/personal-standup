@@ -55,20 +55,20 @@ function buildCards(digest: WeeklyDigest): BounceCardData[] {
   return [
     {
       label: "Wins",
-      icon: "🏆",
-      accent: "rgba(134, 239, 172, 0.85)",
+      icon: "",
+      accent: "#4ade80",
       content: parseDigestField(digest.wins) || "No wins recorded yet.",
     },
     {
       label: "Patterns",
-      icon: "📈",
-      accent: "rgba(147, 197, 253, 0.85)",
+      icon: "",
+      accent: "#4a7cf7",
       content: parseDigestField(digest.patterns) || "No patterns identified yet.",
     },
     {
       label: "Blockers",
-      icon: "🚧",
-      accent: "rgba(252, 165, 165, 0.85)",
+      icon: "",
+      accent: "#d4a853",
       content: parseDigestField(digest.blocker_patterns) || "No blockers recorded yet.",
     },
   ];
