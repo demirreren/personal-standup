@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { motion, AnimatePresence, useMotionValue, useSpring } from "motion/react";
+import ShinyText from "../components/ShinyText";
 import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
@@ -601,8 +602,14 @@ function FeelingDisplay({ value }: { value: number }) {
   const color = getFeelingColor(value);
   return (
     <div className="feeling-display">
-      <span className="feeling-dot" style={{ background: color }} />
-      <span style={{ color }}>{getFeelingLabel(value)}</span>
+      <ShinyText
+        text={getFeelingLabel(value)}
+        color={color}
+        shineColor="#ffffff"
+        speed={2.5}
+        spread={100}
+        direction="left"
+      />
       <span className="feeling-display-value">{value}/10</span>
     </div>
   );

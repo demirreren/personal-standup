@@ -812,30 +812,19 @@ a, button, input, textarea, select, [role="button"] {
 
 /* ============ FEELING DISPLAY (completed) ============ */
 .feeling-display {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 12px;
-}
-
-.feeling-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  opacity: 0.85;
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 18px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .feeling-display-value {
   color: var(--text-muted);
   font-weight: 400;
-  font-size: 12px;
+  font-size: 11px;
+  letter-spacing: 0.2px;
 }
 
 /* ============ STANDUP FORM INPUTS ============ */
@@ -895,36 +884,42 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .standup-field {
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.055);
-  border-radius: 10px;
-  margin-bottom: 6px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-bottom: 16px;
 }
 
 .standup-field-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 7px;
   font-size: 10px;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.7px;
-  margin-bottom: 4px;
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
 }
+
+/* Arrow prefix */
+.standup-field-label::before {
+  content: '→';
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
 
 .standup-field p {
   font-size: 13.5px;
   color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-.blocker-field {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.055);
-}
-
-.blocker-field .standup-field-label {
-  color: var(--text-muted);
+  line-height: 1.65;
+  padding-left: 18px;
 }
 
 /* ============ AI NUDGE ============ */
@@ -2770,13 +2765,9 @@ a, button, input, textarea, select, [role="button"] {
   cursor: default;
 }
 
-/* ---- Morning / Evening accent glow on the card shell ---- */
-.standup-flip-card.morning-card .standup-flip-card-inner {
-  box-shadow: 0 20px 64px rgba(255, 255, 255, 0.07);
-}
-
-.standup-flip-card.evening-card .standup-flip-card-inner {
-  box-shadow: 0 20px 64px rgba(255, 255, 255, 0.07);
+/* ---- Card shell shadow ---- */
+.standup-flip-card .standup-flip-card-inner {
+  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.45);
 }
 
 /* ---- MetaBalls connector between the two cards ---- */
@@ -3175,71 +3166,14 @@ a, button, input, textarea, select, [role="button"] {
   flex: 1;
 }
 
-/* ============ CARD PERSONALITY — accent only, no gradients ============ */
+/* ============ CARD BACK — shared accent, no per-card color splits ============ */
+.standup-flip-card-back {
+  box-shadow: var(--shadow-card), inset 0 2px 0 rgba(91, 156, 246, 0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.standup-flip-card-back::before { background: none; }
 
-/* ---- Morning: amber top-edge + field accents ---- */
-.morning-card .standup-flip-card-back {
-  box-shadow: var(--shadow-card), inset 0 2px 0 rgba(245, 158, 11, 0.55), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-.morning-card .standup-flip-card-back::before { background: none; }
-.morning-card .flip-back-header { border-bottom-color: rgba(245, 158, 11, 0.16); }
-.morning-card .flip-back-header h3 { color: rgba(255, 214, 140, 0.88); }
-
-.morning-card .standup-field {
-  background: rgba(245, 158, 11, 0.04);
-  border: none;
-  border-left: 2px solid rgba(245, 158, 11, 0.4);
-  border-radius: 0 8px 8px 0;
-  padding: 7px 12px 7px 14px;
-  margin-bottom: 8px;
-}
-.morning-card .standup-field .standup-field-label { color: rgba(245, 175, 65, 0.75); }
-
-.morning-card .standup-input:focus {
-  border-color: rgba(245, 158, 11, 0.5);
-  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.08), inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-.morning-card .btn-checkin {
-  background: rgba(220, 138, 10, 0.9);
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.28);
-}
-.morning-card .btn-checkin:hover:not(:disabled) {
-  background: rgba(238, 152, 14, 0.95);
-  box-shadow: 0 4px 18px rgba(245, 158, 11, 0.42);
-}
-
-/* ---- Evening: violet top-edge + field accents ---- */
-.evening-card .standup-flip-card-back {
-  box-shadow: var(--shadow-card), inset 0 2px 0 rgba(139, 92, 246, 0.55), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-.evening-card .standup-flip-card-back::before { background: none; }
-.evening-card .flip-back-header { border-bottom-color: rgba(139, 92, 246, 0.16); }
-.evening-card .flip-back-header h3 { color: rgba(200, 175, 255, 0.88); }
-
-.evening-card .standup-field {
-  background: rgba(139, 92, 246, 0.04);
-  border: none;
-  border-left: 2px solid rgba(139, 92, 246, 0.4);
-  border-radius: 0 8px 8px 0;
-  padding: 7px 12px 7px 14px;
-  margin-bottom: 8px;
-}
-.evening-card .standup-field .standup-field-label { color: rgba(180, 150, 255, 0.75); }
-
-.evening-card .standup-input:focus {
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.08), inset 0 1px 0 rgba(255,255,255,0.04);
-}
-
-.evening-card .btn-checkin {
-  background: rgba(120, 72, 228, 0.9);
-  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.28);
-}
-.evening-card .btn-checkin:hover:not(:disabled) {
-  background: rgba(133, 85, 240, 0.95);
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.42);
-}
+/* Field arrow uses primary blue */
+.standup-field .standup-field-label::before { color: var(--primary); opacity: 0.75; }
 
 /* ============ ELEMENT INTERACTIONS ============ */
 
@@ -3282,12 +3216,15 @@ a, button, input, textarea, select, [role="button"] {
   transform: translateY(0);
 }
 
-/* Standup fields (completed view) — slide along their left border on hover */
+/* Standup fields (completed view) — the whole entry drifts right on hover */
 .standup-field {
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .standup-field:hover {
-  transform: translateX(5px);
+  transform: translateX(6px);
+}
+.standup-field:hover .standup-field-label::before {
+  opacity: 1;
 }
 
 /* Submit button — squish + send icon launches */
