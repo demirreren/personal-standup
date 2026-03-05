@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { api, type WeeklyDigest } from "../lib/api";
 import BounceCards, { type BounceCardData } from "../components/BounceCards";
+import ScrambledText from "../components/ScrambledText";
 
 function formatWeekRange(weekStart: string): string {
   const start = new Date(weekStart + "T12:00:00");
@@ -97,9 +98,15 @@ export default function Weekly() {
       </header>
 
       {!latest ? (
-        <div className="empty-state">
-          <p>No weekly digest yet. Complete some daily check-ins first.</p>
-        </div>
+        <ScrambledText
+          className="page-empty-scramble"
+          radius={120}
+          duration={1.2}
+          speed={0.5}
+          scrambleChars=".:"
+        >
+          No weekly digest yet. Complete some daily check-ins first.
+        </ScrambledText>
       ) : (
         <div className="weekly-bounce-wrapper">
           <BounceCards

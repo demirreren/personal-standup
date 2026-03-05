@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { api, type Checkin } from "../lib/api";
 import { ChevronLeft, ChevronRight, Sun, Moon, AlertTriangle } from "lucide-react";
 import { ParticleCard, GlobalSpotlight } from "../components/MagicBento";
+import ScrambledText from "../components/ScrambledText";
 
 function getFeelingLabel(value: number): string {
   if (value <= 15) return "Drained";
@@ -125,9 +126,15 @@ export default function History() {
       {loading ? (
         <div className="page-loading">Loading...</div>
       ) : sortedDates.length === 0 ? (
-        <div className="empty-state">
-          <p>No check-ins yet for this period.</p>
-        </div>
+        <ScrambledText
+          className="page-empty-scramble"
+          radius={120}
+          duration={1.2}
+          speed={0.5}
+          scrambleChars=".:"
+        >
+          No check-ins yet for this period.
+        </ScrambledText>
       ) : (
         <div ref={bentoRef} className="history-bento-section">
           <GlobalSpotlight containerRef={bentoRef} spotlightRadius={480} />

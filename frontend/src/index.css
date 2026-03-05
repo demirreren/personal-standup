@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Lora:ital,wght@0,400;1,400;1,600&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,1&family=Caveat:wght@500;600&display=swap');
 
 :root {
-  --bg: #0a0d14;
+  --bg: #0e0c18;
   --bg-raised: #111520;
   --bg-card: #151a28;
   --bg-card-hover: #1a2030;
@@ -26,6 +26,10 @@
   --evening-soft: rgba(139, 92, 246, 0.12);
   --error: #ef4444;
   --error-soft: rgba(239, 68, 68, 0.1);
+  --gold: #d4a853;
+  --gold-soft: rgba(212, 168, 83, 0.15);
+  --gold-glow: rgba(212, 168, 83, 0.35);
+  --mono: 'DM Mono', 'Courier New', monospace;
   --radius: 14px;
   --radius-sm: 10px;
   --radius-lg: 20px;
@@ -395,7 +399,7 @@ a, button, input, textarea, select, [role="button"] {
   justify-content: center;
   min-height: 100vh;
   padding: 20px;
-  background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
+  background: radial-gradient(ellipse at top, rgba(70, 50, 195, 0.08) 0%, transparent 60%);
 }
 
 .auth-card {
@@ -1878,7 +1882,7 @@ a, button, input, textarea, select, [role="button"] {
   justify-content: center;
   padding: 40px 20px;
   min-height: 100vh;
-  background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.06) 0%, var(--bg) 60%);
+  background: radial-gradient(ellipse at top, rgba(70, 50, 195, 0.07) 0%, var(--bg) 60%);
 }
 
 .shared-card {
@@ -2676,11 +2680,55 @@ a, button, input, textarea, select, [role="button"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Push content towards the top – mirrors the visual weight of the welcome screen */
-  padding-top: 11vh;
-  padding-bottom: 40px;
+  justify-content: center;
+  padding: 32px 0;
   overflow-y: auto;
 }
+
+/* Breathing blue bloom behind the header */
+.today-page-main::before {
+  content: '';
+  position: fixed;
+  top: -15%;
+  left: 50%;
+  width: 780px;
+  height: 560px;
+  transform: translateX(-50%) scale(1);
+  background: radial-gradient(ellipse, rgba(70, 50, 195, 0.11) 0%, transparent 65%);
+  animation: bg-breathe 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes bg-breathe {
+  0%, 100% {
+    transform: translateX(-50%) scale(1);
+    opacity: 0.75;
+  }
+  50% {
+    transform: translateX(-50%) scale(1.18);
+    opacity: 1;
+  }
+}
+
+/* ---- Staggered page-load entrance ---- */
+@keyframes pageEnterUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.day-arc {
+  animation: pageEnterUp 0.5s ease-out 150ms backwards;
+}
+
+.standup-flip-cards > .standup-card-col:nth-child(1) {
+  animation: pageEnterUp 0.5s ease-out 300ms backwards;
+}
+
+.standup-flip-cards > .standup-card-col:nth-child(2) {
+  animation: pageEnterUp 0.5s ease-out 450ms backwards;
+}
+
 
 /* ============ TODAY SIGNED-IN GREETING ============ */
 .today-greeting-header {
@@ -2695,16 +2743,34 @@ a, button, input, textarea, select, [role="button"] {
   font-size: 62px;
   font-weight: 800;
   letter-spacing: -2.5px;
-  line-height: 1.05;
+  line-height: 1.15;
   color: var(--text);
   font-family: 'Space Grotesk', -apple-system, sans-serif;
   text-align: center;
+  overflow: visible;
+  /* Give chars room to animate up from below the overflow:hidden clip */
+  padding-bottom: 6px;
+}
+
+.greeting-prefix {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.greeting-name {
+  font-family: 'Lora', Georgia, 'Times New Roman', serif;
+  font-style: italic;
+  font-weight: 600;
+  transition: color 0.8s ease;
+  display: inline-block;
 }
 
 .today-greeting-header .date-label {
   font-size: 16px;
   margin-top: 10px;
   text-align: center;
+  color: #a89fc0;
 }
 
 /* ============ STANDUP STAGE (glass wrapper behind both cards) ============ */
@@ -2717,15 +2783,9 @@ a, button, input, textarea, select, [role="button"] {
   z-index: 1;
 }
 
-/* Glass panel behind both cards */
+/* Glass panel removed — cards stand alone */
 .standup-stage::before {
-  content: '';
-  position: absolute;
-  inset: -22px -10px;
-  background: rgba(12, 15, 24, 0.52);
-  border-radius: 28px;
-  z-index: 0;
-  pointer-events: none;
+  content: none;
 }
 
 /* Ambient gradient aura beneath the cards */
@@ -2746,7 +2806,7 @@ a, button, input, textarea, select, [role="button"] {
 /* ============ STANDUP FLIP CARDS ============ */
 .standup-flip-cards {
   display: flex;
-  gap: 36px;
+  gap: 96px;
   position: relative;
   z-index: 1;
   width: 100%;
@@ -2767,7 +2827,9 @@ a, button, input, textarea, select, [role="button"] {
 
 /* ---- Card shell shadow ---- */
 .standup-flip-card .standup-flip-card-inner {
-  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.45);
+  box-shadow:
+    0 20px 64px rgba(0, 0, 0, 0.45),
+    0 0 40px rgba(30, 20, 80, 0.4);
 }
 
 /* ---- MetaBalls connector between the two cards ---- */
@@ -2807,24 +2869,36 @@ a, button, input, textarea, select, [role="button"] {
   overflow: hidden;
 }
 
-/* Front face */
+/* Front face — image handled by TiltedCard */
 .standup-flip-card-front {
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(15%) brightness(0.78) saturate(1.1);
+  background: none;
+  overflow: hidden;
+}
+
+/* TiltedCard fills the front face 100% */
+.standup-flip-card-front .tilted-card-figure,
+.standup-flip-card-front .tilted-card-inner {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.standup-flip-card-front .tilted-card-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: var(--radius-lg);
+  filter: grayscale(8%) brightness(0.85) contrast(1.05);
   transition: filter 0.3s ease;
 }
 
-.standup-flip-card:hover .standup-flip-card-front {
-  filter: grayscale(5%) brightness(0.86) saturate(1.2);
+/* Overlay fills the card */
+.standup-flip-card-front .tilted-card-overlay {
+  width: 100%;
+  height: 100%;
 }
 
-.standup-flip-card-front.morning {
-  background-image: url('/morning.jpg');
-}
-
-.standup-flip-card-front.evening {
-  background-image: url('/evening.jpg');
+.standup-flip-card-front .flip-card-overlay {
+  width: 100%;
+  height: 100%;
 }
 
 .flip-card-overlay {
@@ -2836,12 +2910,10 @@ a, button, input, textarea, select, [role="button"] {
   padding: 20px 22px;
 }
 
-.flip-card-overlay.morning-overlay {
-  background: linear-gradient(170deg, rgba(30, 40, 70, 0.25) 0%, rgba(0, 0, 0, 0.72) 100%);
-}
-
+.flip-card-overlay.morning-overlay,
 .flip-card-overlay.evening-overlay {
-  background: linear-gradient(170deg, rgba(30, 40, 70, 0.25) 0%, rgba(0, 0, 0, 0.72) 100%);
+  background:
+    linear-gradient(to top, #0e0c18 0%, rgba(14, 12, 24, 0.55) 38%, rgba(14, 12, 24, 0.0) 68%);
 }
 
 .flip-card-top-row {
@@ -2952,6 +3024,7 @@ a, button, input, textarea, select, [role="button"] {
 
 .flip-card-front-bottom {
   /* anchored to bottom by flex justify-content: space-between */
+  transition: transform 0.3s ease;
 }
 
 .flip-card-title-row {
@@ -3012,37 +3085,15 @@ a, button, input, textarea, select, [role="button"] {
   cursor: not-allowed;
 }
 
-/* ---- Day progress pips ---- */
-.day-progress {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 20px;
-  animation: fadeIn 0.4s ease 0.3s backwards;
+
+/* Back face — hidden from DOM entirely until flipped.
+   backdrop-filter forces compositing before 3D visibility is resolved,
+   so the back face bleeds through as an opaque rectangle even when
+   backface-visibility: hidden. display:none prevents this entirely. */
+.standup-flip-card:not(.flipped) .standup-flip-card-back {
+  display: none;
 }
 
-.day-progress-pip {
-  width: 22px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  transition: background 0.35s ease, box-shadow 0.35s ease;
-}
-
-.day-progress-pip.done {
-  background: var(--primary);
-  box-shadow: 0 0 6px rgba(91, 156, 246, 0.5);
-}
-
-.day-progress-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-muted);
-  margin-left: 4px;
-  letter-spacing: 0.2px;
-}
-
-/* Back face */
 .standup-flip-card-back {
   transform: rotateY(180deg);
   background: linear-gradient(
@@ -3127,26 +3178,26 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .flip-back-close {
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(212, 168, 83, 0.18);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 10px;
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-weight: 600;
+  color: rgba(212, 168, 83, 0.45);
   cursor: pointer;
   font-family: inherit;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
   flex-shrink: 0;
+  padding: 0;
 }
 
 .flip-back-close:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--text);
+  border-color: rgba(212, 168, 83, 0.55);
+  color: var(--gold);
+  background: rgba(212, 168, 83, 0.07);
 }
 
 .standup-flip-card-back .checkin-form {
@@ -3251,6 +3302,810 @@ a, button, input, textarea, select, [role="button"] {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.3px;
+}
+
+/* ============ DAY ARC (time ribbon) ============ */
+.day-arc {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto 28px;
+  position: relative;
+  z-index: 1;
+  animation: fadeIn 0.5s ease 0.4s backwards;
+}
+
+/* Icons + track in one flex row */
+.day-arc-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.day-arc-track {
+  flex: 1;
+  position: relative;
+  height: 2px;
+  background: #2a2535;
+  border-radius: 999px;
+  overflow: visible;
+  box-shadow: none;
+}
+
+.day-arc-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg,
+    rgba(245, 158, 11, 0.6) 0%,
+    rgba(91, 156, 246, 0.5) 50%,
+    rgba(139, 92, 246, 0.6) 100%
+  );
+  transition: width 1s ease;
+}
+
+@keyframes arc-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0   rgba(255, 255, 255, 0.7),
+      0 0 0 0   rgba(255, 255, 255, 0.2),
+      0 0 8px   rgba(255, 255, 255, 0.4);
+  }
+  50% {
+    box-shadow:
+      0 0 0 5px  rgba(255, 255, 255, 0.12),
+      0 0 0 11px rgba(255, 255, 255, 0),
+      0 0 20px   rgba(255, 255, 255, 0.65);
+  }
+}
+
+.day-arc-now {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  animation: arc-pulse 2.8s ease-in-out infinite;
+  transition: left 1s ease;
+  z-index: 2;
+}
+
+/* Arc edge icons */
+.arc-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.arc-icon--sunrise {
+  color: #f59e0b;
+  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.7)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+  opacity: 0.9;
+}
+
+.arc-icon--moon {
+  color: #818cf8;
+  filter: drop-shadow(0 0 5px rgba(129, 140, 248, 0.7)) drop-shadow(0 0 10px rgba(129, 140, 248, 0.4));
+  opacity: 0.9;
+}
+
+/* ============ CARD PROMPTS (morning + evening) ============ */
+.flip-card-prompt {
+  margin-top: 6px;
+  font-size: 11px;
+  font-style: italic;
+  font-family: 'Playfair Display', 'Lora', Georgia, serif;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.55;
+  max-width: 200px;
+  letter-spacing: 0.1px;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* ============ FEELING DISPLAY BAR ============ */
+.feeling-display {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: unset;
+  font-weight: unset;
+}
+
+.feeling-display-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.feeling-display-bar-track {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.feeling-display-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: rgba(34, 197, 94, 0.7) !important; /* always green, overrides inline color */
+  transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ============ BANDED STANDUP FIELDS (left-edge color bar system) ============ */
+.structured-content.banded-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 4px;
+}
+
+/* suppress old arrow prefix inside banded layout */
+.banded-fields .standup-field-label::before {
+  content: none;
+}
+
+.banded-fields .standup-field {
+  padding: 13px 14px 13px 15px;
+  margin-bottom: 0;
+  border-left: 3px solid transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 0;
+  transition: background 0.18s ease;
+}
+
+.banded-fields .standup-field:last-child {
+  border-bottom: none;
+}
+
+.banded-fields .standup-field:hover {
+  transform: none;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Section-specific bar colors */
+.banded-fields .sf-yesterday { border-left-color: rgba(34, 197, 94, 0.55); }
+.banded-fields .sf-today     { border-left-color: rgba(91, 156, 246, 0.55); }
+.banded-fields .sf-blockers  { border-left-color: rgba(245, 158, 11, 0.55); }
+.banded-fields .sf-happened  { border-left-color: rgba(212, 168, 83, 0.55); }
+.banded-fields .sf-carryover { border-left-color: rgba(212, 168, 83, 0.3); }
+
+/* Label — DM Mono tiny all-caps */
+.banded-fields .standup-field-label {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  gap: 0;
+}
+
+/* Content text */
+.banded-fields .standup-field p {
+  padding-left: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.65;
+}
+
+/* ============ EVENING ENERGY SLIDER ============ */
+.energy-slider-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.energy-slider-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.energy-slider-question {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.energy-slider-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.1px;
+  transition: color 0.2s ease;
+}
+
+.energy-slider-track-wrap {
+  position: relative;
+  padding-top: 22px;
+}
+
+.energy-slider-tooltip {
+  position: absolute;
+  top: 2px;
+  /*
+   * Thumb (18px wide) travels from 9px to (100% - 9px).
+   * So the center of the thumb = 9px + pct/100 * (100% - 18px).
+   * translateX(-50%) then centers the number over it.
+   */
+  left: calc(9px + (var(--slider-pct, 0) / 100) * (100% - 18px));
+  transform: translateX(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gold);
+  pointer-events: none;
+  white-space: nowrap;
+  transition: left 0.08s ease;
+  line-height: 1;
+}
+
+.energy-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5b9cf6 0%, var(--gold) 100%);
+  outline: none;
+  cursor: pointer;
+  display: block;
+}
+
+.energy-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow:
+    0 0 0 3px rgba(212, 168, 83, 0.18),
+    0 0 14px rgba(212, 168, 83, 0.45);
+  cursor: grab;
+  transition: box-shadow 0.2s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.energy-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.18);
+  box-shadow:
+    0 0 0 5px rgba(212, 168, 83, 0.2),
+    0 0 24px rgba(212, 168, 83, 0.55);
+}
+
+.energy-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: none;
+  box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.18), 0 0 14px rgba(212, 168, 83, 0.45);
+  cursor: grab;
+}
+
+.energy-slider-ends {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  opacity: 0.65;
+}
+
+/* ============ SIGN-OFF BUTTON (check in / check out) ============ */
+.btn-checkin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: auto;
+  padding: 9px 22px;
+  background: transparent;
+  color: rgba(212, 168, 83, 0.75);
+  border: 1px solid rgba(212, 168, 83, 0.3);
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 500;
+  font-family: var(--mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: none;
+}
+
+.btn-checkin:hover:not(:disabled) {
+  background: rgba(212, 168, 83, 0.88);
+  color: #0a0d14;
+  border-color: rgba(212, 168, 83, 0.88);
+  box-shadow: 0 0 16px rgba(212, 168, 83, 0.2);
+  transform: none;
+}
+
+.btn-checkin:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.btn-checkin svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-checkin:hover:not(:disabled) svg {
+  transform: translateX(2px) translateY(-2px) rotate(-25deg);
+}
+
+.btn-checkin:active:not(:disabled) {
+  transform: none;
+  box-shadow: none;
+}
+
+/* footer: center the button */
+.checkin-form-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* ============ CARD COLUMN WRAPPERS (seal + flip card) ============ */
+.standup-card-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Hover-lift shell around each flip card — isolates CSS transform from Framer Motion */
+.card-hover-lift {
+  width: 100%;
+  transition: transform 0.3s ease;
+}
+
+.card-hover-lift:not(.is-flipped):hover {
+  transform: translateY(-4px);
+}
+
+
+.card-hover-lift:not(.is-flipped):hover .tilted-card-img {
+  filter: grayscale(0%) brightness(0.96) contrast(1.08) saturate(1.15) !important;
+  transition: filter 0.3s ease !important;
+}
+
+.card-hover-lift:not(.is-flipped):hover .flip-card-front-bottom {
+  transform: translateY(-5px);
+}
+
+.standup-card-col .standup-flip-card {
+  width: 100%;
+  flex: none;
+}
+
+/* ============================================================
+   DARK ATELIER CARD THEME — open card, v3
+   A darkroom. A late-night studio. Same world as the app.
+   Palette: bg #0a0d14 + warm vignette · text #c8bfa8
+            gold #d4a853 · dim #4a4535 · rule #2e2c1a
+   ============================================================ */
+
+/* ── Opacity crossfade: disable the 3D flip entirely ── */
+.standup-flip-card-inner {
+  transform-style: flat !important;
+  transition: none !important;
+}
+.standup-flip-card.flipped .standup-flip-card-inner {
+  transform: none !important;
+}
+.standup-flip-card-front,
+.standup-flip-card-back {
+  backface-visibility: visible !important;
+  -webkit-backface-visibility: visible !important;
+}
+/* Front fades out as card opens */
+.standup-flip-card-front {
+  transition: opacity 0.22s ease !important;
+}
+.standup-flip-card.flipped .standup-flip-card-front {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+/* Back: always in layout — invisible + absolutely positioned when closed so
+   it doesn't push the front card's height */
+.standup-flip-card:not(.flipped) .standup-flip-card-back {
+  display: flex !important;
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.standup-flip-card-back {
+  transform: none !important;
+  transition: opacity 0.35s ease !important;
+}
+/* When open: become a normal flow element so the card sizes to content */
+.standup-flip-card.flipped {
+  min-height: 0;
+}
+.standup-flip-card.flipped .standup-flip-card-inner {
+  height: auto !important;
+  min-height: 0 !important;
+}
+.standup-flip-card.flipped .standup-flip-card-back {
+  position: relative !important;
+  inset: auto !important;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Warm atelier background — matches site dark navy + centered warmth ── */
+.standup-flip-card-back {
+  background:
+    radial-gradient(ellipse 85% 60% at 50% 28%, rgba(19, 17, 31, 0.92) 0%, transparent 70%),
+    rgba(14, 12, 24, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 168, 83, 0.15);
+  border-radius: 12px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(212, 168, 83, 0.05);
+  color: #c8bfa8;
+  padding: 28px 32px;
+  gap: 0;
+}
+
+/* border brightens when open */
+.standup-flip-card.flipped .standup-flip-card-back {
+  border-color: rgba(212, 168, 83, 0.28);
+}
+
+/* suppress old glow bleed pseudo-element */
+.standup-flip-card-back::before {
+  display: none;
+}
+
+/* ── Staggered fade-in for form elements ── */
+@keyframes atelier-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.standup-flip-card.flipped .atelier-float-header {
+  animation: atelier-in 0.38s ease both;
+  animation-delay: 0ms;
+}
+.standup-flip-card.flipped .mood-glyphs-wrap {
+  animation: atelier-in 0.38s ease both;
+  animation-delay: 105ms;
+}
+.standup-flip-card.flipped .atelier-field {
+  animation: atelier-in 0.38s ease both;
+}
+.standup-flip-card.flipped .checkin-form-footer {
+  animation: atelier-in 0.38s ease both;
+  animation-delay: 380ms;
+}
+/* completed view */
+.standup-flip-card.flipped .feeling-display {
+  animation: atelier-in 0.38s ease 60ms both;
+}
+.standup-flip-card.flipped .banded-fields {
+  animation: atelier-in 0.38s ease 120ms both;
+}
+
+/* ── Floating title — no header bar, no separator ── */
+.atelier-float-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.atelier-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Playfair Display italic — same gold family as the accent color */
+.atelier-title {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-style: italic !important;
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  color: #d4b96a !important;
+  letter-spacing: 0.1px;
+  line-height: 1.2;
+}
+
+/* DM Mono micro-timestamp */
+.atelier-timestamp {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 10px;
+  color: #4a4535;
+  letter-spacing: 0.2px;
+  line-height: 1;
+}
+
+/* ── Close: bare ✕ in DM Mono, no container ── */
+.atelier-close {
+  background: none;
+  border: none;
+  padding: 2px 0 0 0;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 13px;
+  color: #4a4535;
+  cursor: pointer;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.18s ease;
+}
+
+.atelier-close:hover {
+  color: #c8bfa8;
+}
+
+/* completed state: check-in time */
+.standup-flip-card-back .check-state-text {
+  color: #4a4535;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 10px;
+}
+
+/* ── Mood glyphs — emotional spectrum, replaces slider ── */
+.mood-glyphs-wrap {
+  margin-bottom: 20px;
+  /* top padding so tooltip has room to appear above without clipping */
+  padding-top: 26px;
+}
+
+.mood-glyphs-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0;
+}
+
+/* visible 1px ruled line — the scale lives on this line */
+.mood-glyphs-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #2e2c1a;
+  pointer-events: none;
+}
+
+.mood-glyph-btn {
+  position: relative;
+  z-index: 1;
+  background: none;
+  border: none;
+  padding: 6px 0;
+  color: #4a4535;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  transition:
+    color 0.18s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.18s ease;
+}
+
+.mood-glyph-btn:hover {
+  color: rgba(212, 168, 83, 0.72);
+  transform: scale(1.18) translateY(-2px);
+}
+
+.mood-glyph-btn.selected {
+  color: #d4a853;
+  transform: scale(1.25) translateY(-2px);
+  filter: drop-shadow(0 0 5px rgba(212, 168, 83, 0.4));
+}
+
+/* Floating tooltip — 10px DM Mono, gold, sits 8px above the glyph */
+.mood-glyph-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 10px;
+  color: #d4a853;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  letter-spacing: 0.03em;
+}
+
+.mood-glyph-btn.selected .mood-glyph-tooltip,
+.mood-glyph-btn:hover .mood-glyph-tooltip {
+  opacity: 1;
+}
+
+/* ── Ruled-line inputs — bottom border only ── */
+.standup-flip-card-back .standup-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #2e2c1a;
+  border-radius: 0;
+  padding: 10px 0;
+  color: #c8bfa8;
+  font-size: 13px;
+  font-family: inherit;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.standup-flip-card-back .standup-input:hover {
+  background: transparent;
+  border-color: rgba(212, 168, 83, 0.22);
+  box-shadow: none;
+}
+
+.standup-flip-card-back .standup-input:focus {
+  background: transparent;
+  border-bottom: 1px solid rgba(212, 168, 83, 0.6);
+  box-shadow: none;
+  transform: none;
+}
+
+/* Playfair italic placeholder — personal, lowercase */
+.standup-flip-card-back .standup-input::placeholder {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 13px;
+  color: #4a4535;
+}
+
+/* override card-specific focus rules */
+.morning-card .standup-flip-card-back .standup-input:focus,
+.evening-card .standup-flip-card-back .standup-input:focus {
+  border-bottom: 1px solid rgba(212, 168, 83, 0.6);
+  box-shadow: none;
+}
+
+/* softer sibling-dim */
+.standup-flip-card-back .checkin-form:has(.standup-input:focus) .standup-input:not(:focus) {
+  opacity: 0.42;
+  transform: none;
+}
+
+/* no float-up */
+.standup-flip-card-back .standup-input:focus {
+  transform: none;
+}
+
+/* atelier-field wrapper: spacing + stagger anchor */
+.atelier-field {
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+/* form layout */
+.atelier-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0 !important;
+}
+
+.atelier-form .checkin-form-footer {
+  margin-top: 22px;
+}
+
+/* ── Full-width architectural button ── */
+@keyframes stamp-press {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+
+.standup-flip-card-back .btn-checkin {
+  width: 100%;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #d4a853;
+  background: transparent;
+  border: 1px solid rgba(212, 168, 83, 0.5);
+  border-radius: 4px;
+  box-shadow: none;
+  transform: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.standup-flip-card-back .btn-checkin:hover:not(:disabled) {
+  background: rgba(212, 168, 83, 0.1);
+  border-color: rgba(212, 168, 83, 0.8);
+  color: #d4a853;
+  box-shadow: none;
+  transform: none;
+}
+
+.standup-flip-card-back .btn-checkin:active:not(:disabled) {
+  animation: stamp-press 0.18s ease forwards;
+}
+
+.standup-flip-card-back .btn-checkin:disabled {
+  opacity: 0.2;
+  transform: none;
+}
+
+.standup-flip-card-back .btn-checkin svg {
+  display: none;
+}
+
+/* ── Completed view — banded fields in atelier ── */
+.standup-flip-card-back .banded-fields .standup-field {
+  border-bottom-color: rgba(46, 44, 26, 0.8);
+}
+
+.standup-flip-card-back .banded-fields .standup-field:hover {
+  background: rgba(212, 168, 83, 0.03);
+}
+
+.standup-flip-card-back .banded-fields .sf-yesterday { border-left-color: rgba(80, 160, 90, 0.4); }
+.standup-flip-card-back .banded-fields .sf-today     { border-left-color: rgba(91, 156, 246, 0.35); }
+.standup-flip-card-back .banded-fields .sf-blockers  { border-left-color: rgba(245, 158, 11, 0.4); }
+.standup-flip-card-back .banded-fields .sf-happened  { border-left-color: rgba(212, 168, 83, 0.45); }
+.standup-flip-card-back .banded-fields .sf-carryover { border-left-color: rgba(212, 168, 83, 0.22); }
+
+.standup-flip-card-back .banded-fields .standup-field-label {
+  color: #4a4535;
+}
+
+.standup-flip-card-back .banded-fields .standup-field p {
+  color: #c8bfa8;
+  font-size: 12.5px;
+}
+
+/* feeling bar */
+.standup-flip-card-back .feeling-display-bar-track {
+  background: rgba(46, 44, 26, 0.8);
+}
+
+.standup-flip-card-back .feeling-display-value {
+  color: #4a4535;
 }
 
 /* ============ RESPONSIVE ============ */
