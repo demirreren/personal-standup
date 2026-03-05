@@ -22,6 +22,7 @@ package-lock.json
 .env
 .env.*
 !.env.example
+!frontend/.env.production
 
 # OS
 .DS_Store
