@@ -78,8 +78,8 @@ export default function Dashboard() {
                   <stop offset="95%" stopColor="#4a7cf7" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="date" tick={{ fill: "#44445a", fontSize: 10 }} tickLine={false} axisLine={false} />
-              <YAxis domain={[1, 10]} ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} tick={{ fill: "#44445a", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <XAxis dataKey="date" tick={{ fill: "#6b6880", fontSize: 10 }} tickLine={false} axisLine={false} />
+              <YAxis domain={[1, 10]} ticks={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]} tick={{ fill: "#6b6880", fontSize: 10 }} tickLine={false} axisLine={false} />
               <Tooltip
                 contentStyle={{
                   background: "rgba(10,13,20,0.95)",
@@ -88,7 +88,7 @@ export default function Dashboard() {
                   fontSize: 12,
                   boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
                 }}
-                labelStyle={{ color: "#66667a", marginBottom: 4 }}
+                labelStyle={{ color: "#8b88a8", marginBottom: 4 }}
                 itemStyle={{ color: "#4a7cf7" }}
                 formatter={(v: number) => [`${v}/10 — ${getFeelingLabel(v)}`, ""]}
               />
@@ -111,6 +111,11 @@ export default function Dashboard() {
           <div className="chart-header">
             <TrendingUp size={14} />
             <h3>Daily completion</h3>
+            <div className="heatmap-legend">
+              <span className="legend-item"><span className="heatmap-cell empty" /> None</span>
+              <span className="legend-item"><span className="heatmap-cell half" /> Partial</span>
+              <span className="legend-item"><span className="heatmap-cell full" /> Complete</span>
+            </div>
           </div>
           <div className="heatmap">
             {completionData.map((d, i) => (
@@ -128,11 +133,6 @@ export default function Dashboard() {
                 }`}
               />
             ))}
-          </div>
-          <div className="heatmap-legend">
-            <span className="legend-item"><span className="heatmap-cell empty" /> None</span>
-            <span className="legend-item"><span className="heatmap-cell half" />  Partial</span>
-            <span className="legend-item"><span className="heatmap-cell full" />  Complete</span>
           </div>
         </div>
       )}
@@ -203,7 +203,13 @@ function MoodCard({ value }: { value: number }) {
   return (
     <div className="stat-card stat-mood">
       <span className="stat-eyebrow">Avg Feeling</span>
-      <div className="mood-word" style={{ color }}>{label}</div>
+      <div
+        className="mood-word"
+        style={{
+          color,
+          textShadow: `0 0 16px ${color.replace("hsl(", "hsla(").replace(")", ", 0.4)")}`,
+        }}
+      >{label}</div>
       <div className="mood-spectrum">
         <div className="mood-spectrum-track" />
         <div

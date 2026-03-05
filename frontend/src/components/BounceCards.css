@@ -7,9 +7,9 @@
 
 .bounce-card {
   position: absolute;
-  width: 270px;
-  height: 370px;
-  border-radius: 12px;
+  width: 280px;
+  height: 390px;
+  border-radius: 16px;
   overflow: hidden;
   cursor: default;
   display: flex;
@@ -17,53 +17,87 @@
   padding: 0;
   gap: 0;
 
-  background: #13111f;
-  border: 1px solid #2e2c42;
+  /* Glass base */
+  background: linear-gradient(
+    148deg,
+    rgba(36, 32, 58, 0.82) 0%,
+    rgba(19, 17, 31, 0.94) 55%,
+    rgba(14, 12, 24, 0.97) 100%
+  );
+  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
 
-  /* 3px left edge accent — set per card via --card-accent-left */
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-left: 3px solid var(--card-accent-left, #4a7cf7);
 
   box-shadow:
-    0 12px 40px rgba(0, 0, 0, 0.45),
-    0 2px 8px rgba(0, 0, 0, 0.3);
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 1px 0 0 rgba(255, 255, 255, 0.03),
+    0 20px 60px rgba(0, 0, 0, 0.55),
+    0 4px 16px rgba(0, 0, 0, 0.35);
 
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
-.bounce-card:hover {
-  border-color: #3a3858;
-  border-left-color: var(--card-accent-left, #4a7cf7);
-  box-shadow:
-    0 24px 56px rgba(0, 0, 0, 0.55),
-    0 4px 16px rgba(0, 0, 0, 0.35);
-  z-index: 10;
+/* Gloss sweep across the top-left */
+.bounce-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    138deg,
+    rgba(255, 255, 255, 0.055) 0%,
+    rgba(255, 255, 255, 0.01) 38%,
+    transparent 60%
+  );
+  pointer-events: none;
+  z-index: 0;
 }
 
+.bounce-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bounce-card:hover {
+  border-color: rgba(255, 255, 255, 0.13);
+  border-left-color: var(--card-accent-left, #4a7cf7);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 1px 0 0 rgba(255, 255, 255, 0.04),
+    0 28px 72px rgba(0, 0, 0, 0.65),
+    0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Header ── */
 .bounce-card-header {
   display: flex;
-  align-items: center;
-  padding: 20px 20px 14px;
-  border-bottom: 1px solid #2e2c42;
+  flex-direction: column;
+  gap: 4px;
+  padding: 22px 22px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .bounce-card-label {
-  font-family: 'DM Mono', 'Courier New', monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #6b6880;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--card-accent-left, #e8e6f0);
+  line-height: 1.15;
 }
 
+/* ── Body ── */
 .bounce-card-content {
   font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 400;
-  line-height: 1.75;
+  line-height: 1.78;
   color: #b8b4cc;
   overflow-y: auto;
   flex: 1;
-  padding: 16px 20px;
+  padding: 16px 22px 20px;
   margin: 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.06) transparent;
@@ -74,6 +108,6 @@
   width: 3px;
 }
 .bounce-card-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
 }

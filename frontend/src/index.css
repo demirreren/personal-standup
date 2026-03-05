@@ -489,7 +489,7 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .page-header .date-label {
-  color: var(--text-muted);
+  color: #8b88a8;
   font-family: var(--mono);
   font-size: 12px;
   margin-top: 6px;
@@ -980,275 +980,371 @@ a, button, input, textarea, select, [role="button"] {
   color: var(--text);
 }
 
-/* ============ HISTORY — JOURNAL REDESIGN ============ */
+/* ============ HISTORY — CARD DECK ============ */
 
-.journal-page {
+.history-page {
   position: relative;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 40px 32px 100px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  animation: fadeIn 0.3s ease;
 }
 
-/* Blue radial glow drifting in from the top */
-.journal-atmosphere {
+/* Blue radial glow bleeding in from top-left */
+.history-atmosphere {
   position: fixed;
-  top: -80px;
-  left: 50%;
-  transform: translateX(-30%);
-  width: 800px;
-  height: 560px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(72, 52, 180, 0.16) 0%, rgba(40, 30, 120, 0.06) 50%, transparent 72%);
+  top: -140px;
+  left: -100px;
+  width: 720px;
+  height: 520px;
+  background: radial-gradient(
+    ellipse at 18% 18%,
+    rgba(72, 52, 180, 0.18) 0%,
+    rgba(40, 30, 120, 0.08) 45%,
+    transparent 70%
+  );
   pointer-events: none;
   z-index: 0;
 }
 
-/* ── Page title ── */
-.journal-page-title {
+/* ── Page header ── */
+.history-header {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+  animation: fadeUp 0.4s ease;
+}
+
+.history-title {
   font-family: 'DM Sans', -apple-system, sans-serif;
   font-size: 32px;
   font-weight: 600;
-  color: var(--text);
-  margin: 0 0 4px;
   letter-spacing: -0.5px;
-}
-
-/* ── Header ── */
-.journal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 52px;
-  position: relative;
-  z-index: 1;
-}
-
-.journal-header-left {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.journal-month-title {
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  font-style: normal;
-  font-size: 22px;
-  font-weight: 500;
   color: var(--text);
-  line-height: 1.2;
-  margin: 0;
-  letter-spacing: -0.3px;
+  margin: 0 0 8px;
 }
 
-.journal-byline {
-  font-family: var(--mono);
+.history-stats {
+  font-family: 'DM Mono', 'Courier New', monospace;
   font-size: 11px;
-  color: #4a4560;
-  margin: 0;
+  color: var(--text-muted);
   letter-spacing: 0.2px;
-  line-height: 1.5;
-}
-
-/* ── Pagination ── */
-.journal-pagination {
-  display: flex;
-  gap: 24px;
-  flex-shrink: 0;
-  padding-top: 8px;
-}
-
-.journal-nav-link {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #4a4560;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  letter-spacing: 0.3px;
-  transition: color 0.2s ease;
-}
-
-.journal-nav-link:hover {
-  color: #c8bfa8;
+  margin: 0;
 }
 
 /* ── Loading ── */
-.journal-loading {
-  font-family: var(--mono);
+.history-loading {
+  font-family: 'DM Mono', 'Courier New', monospace;
   font-size: 20px;
   color: #2a2535;
-  text-align: center;
   padding: 80px 0;
   letter-spacing: 8px;
-  animation: journal-blink 2.2s ease infinite;
+  animation: history-blink 2.2s ease infinite;
 }
 
-@keyframes journal-blink {
-  0%, 100% { opacity: 0.25; }
-  50% { opacity: 0.8; }
+@keyframes history-blink {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
 }
 
-/* ── Journal scroll container ── */
-.journal-scroll {
+/* ── Scroll area wrapper ── */
+.history-scroll-area {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  /* Break out of the main-content padding to fill the full width */
+  margin-left: -48px;
+  margin-right: -48px;
+}
+
+/* ── Horizontal scroll container ── */
+.history-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding: 8px 72px 40px;
+  height: 100%;
+  align-items: stretch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   position: relative;
   z-index: 1;
 }
 
-/* ── Each day entry ── */
-.journal-entry {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 0 32px;
-  padding: 28px 0;
-  border-top: 1px solid #1e1c2e;
-  position: relative;
-  animation: journal-rise calc(0.35s + calc(var(--entry-index, 0) * 0.04s)) ease backwards;
-  animation-delay: calc(var(--entry-index, 0) * 0.03s);
+.history-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-@keyframes journal-rise {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Today's entry: blue left rule */
-.journal-entry--today {
-  border-left: 3px solid #4a7cf7;
-  padding-left: 20px;
-  margin-left: -23px;
-}
-
-/* Empty day: compact and recessive */
-.journal-entry--empty {
-  padding-top: 16px;
-  padding-bottom: 16px;
-}
-
-/* ── Date margin ── */
-.journal-date-margin {
+/* ── Date card ── */
+.history-card {
+  flex-shrink: 0;
+  width: 280px;
+  scroll-snap-align: start;
+  background: rgba(19, 17, 31, 0.52);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 4px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius);
+  padding: 20px 18px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 5px;
-  padding-top: 6px;
+  gap: 12px;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease backwards;
+}
+
+/* Subtle top-edge glass highlight */
+.history-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.12) 40%, rgba(255,255,255,0.12) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.history-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(74, 124, 247, 0.35);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(74, 124, 247, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+}
+
+/* Today: blue left border only — same glass as siblings, just marked */
+.history-card--today {
+  border-left: 3px solid #4a7cf7;
+}
+
+/* ── Date area ── */
+.history-card-date {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   flex-shrink: 0;
 }
 
-.journal-entry--empty .journal-date-margin {
-  opacity: 0.2;
-}
-
-.journal-day-num {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 64px;
-  font-weight: 400;
-  line-height: 0.9;
-  color: #1e1c2e;
-  letter-spacing: -3px;
+.history-card-daynum {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -2px;
   display: block;
 }
 
-.journal-day-meta {
-  font-family: var(--mono);
+.history-card-daymeta {
+  font-family: 'DM Mono', 'Courier New', monospace;
   font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #2a2535;
+  color: var(--text-muted);
   display: block;
-  white-space: nowrap;
 }
 
-/* ── Entry content ── */
-.journal-content {
-  min-width: 0;
-  padding-top: 10px;
+/* ── Hairline divider ── */
+.history-card-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
 }
 
-/* ── Two halves: morning + evening ── */
-.journal-halves {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
+/* ── Sections container ── */
+.history-card-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
 }
 
-.journal-half {
+/* Between-section thin divider */
+.history-section-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 10px 0;
+  flex-shrink: 0;
+}
+
+/* ── Each section (morning / evening) ── */
+.history-section {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  flex: 1;
+  min-height: 0;
 }
 
-/* Absent half: show header at 30% opacity, hide body entirely */
-.journal-half--absent {
+.history-section--absent {
   opacity: 0.3;
 }
 
-/* ── Half header ── */
-.journal-half-header {
+/* ── Section header ── */
+.history-section-header {
   display: flex;
   align-items: center;
-  gap: 7px;
-  margin-bottom: 4px;
-}
-
-.journal-half-icon {
+  gap: 6px;
   flex-shrink: 0;
-  opacity: 0.65;
 }
 
-.journal-half-icon--sun {
-  color: #c87941;
+.history-section-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
 }
 
-.journal-half-icon--moon {
-  color: #7b6fa0;
-}
+.history-section-icon--sun  { color: #c87941; }
+.history-section-icon--moon { color: #7b6fa0; }
 
-.journal-half-label {
-  font-family: var(--mono);
-  font-size: 9px;
+.history-section-label {
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 8px;
   text-transform: uppercase;
   letter-spacing: 1.2px;
-  color: #4a4560;
+  color: var(--text-muted);
 }
 
-/* ── Half body ── */
-.journal-half-body {
+/* ── Section body ── */
+.history-section-body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  overflow: hidden;
 }
 
-/* ── Mood word ── */
-.journal-mood-word {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-style: italic;
-  font-size: 17px;
-  font-weight: 400;
+/* ── Mood word — DM Sans medium, gold ── */
+.history-mood-word {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  color: var(--gold);
   line-height: 1.2;
   display: block;
-  margin-bottom: 3px;
+  flex-shrink: 0;
 }
 
 /* ── Prose body text ── */
-.journal-prose {
+.history-prose {
   font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 400;
-  color: #b8b4cc;
-  line-height: 1.72;
+  color: var(--text-secondary);
+  line-height: 1.62;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* ── Blocker — one quiet italic line ── */
-.journal-blocker {
-  font-family: 'Playfair Display', Georgia, serif;
+/* ── Blocker — gold italic ── */
+.history-blocker {
+  font-family: 'DM Sans', -apple-system, sans-serif;
   font-style: italic;
-  font-size: 12.5px;
-  color: #a07840;
-  margin: 2px 0 0;
-  line-height: 1.55;
-  opacity: 0.8;
+  font-size: 12px;
+  color: var(--gold);
+  opacity: 0.7;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Arrow buttons — bare, no borders ── */
+.history-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 22px;
+  color: var(--text-muted);
+  padding: 12px 10px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  line-height: 1;
+}
+
+.history-arrow:hover {
+  color: var(--text);
+}
+
+.history-arrow--left  { left: 0; }
+.history-arrow--right { right: 0; }
+
+/* ── Edge fade gradients ── */
+.history-scroll-fade-right,
+.history-scroll-fade-left {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 80px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.history-scroll-fade-right {
+  right: 0;
+  background: linear-gradient(to left, #0e0c18 0%, transparent 100%);
+}
+
+.history-scroll-fade-left {
+  left: 0;
+  background: linear-gradient(to right, #0e0c18 0%, transparent 100%);
+}
+
+/* ── Floating month chapter marker ── */
+@keyframes month-chapter {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  12%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  78%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.98); }
+}
+
+.history-month-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: rgba(14, 12, 24, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 7px 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 20;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.history-month-overlay--visible {
+  animation: month-chapter 1.8s ease forwards;
 }
 
 /* ============ DASHBOARD ============ */
@@ -1257,16 +1353,15 @@ a, button, input, textarea, select, [role="button"] {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
-  gap: 0;
+  gap: 14px;
   margin-bottom: 24px;
 }
 
-/* Flat stat block — no glass, no shadow, no radius */
 .stat-card {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  padding: 32px 28px;
+  background: #13111f;
+  border: 1px solid #2e2c42;
+  border-radius: 12px;
+  padding: 24px;
   position: relative;
   overflow: hidden;
   animation: fadeUp 0.45s ease backwards;
@@ -1283,12 +1378,12 @@ a, button, input, textarea, select, [role="button"] {
   font-weight: 500;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: #8b88a8;
   margin-bottom: 12px;
 }
 
 /* ── Streak ── */
-.stat-streak { grid-column: 1; grid-row: 1; border-right: 1px solid #1e1c2e; border-bottom: 1px solid #1e1c2e; }
+.stat-streak { grid-column: 1; grid-row: 1; }
 
 .streak-body {
   display: flex;
@@ -1312,6 +1407,7 @@ a, button, input, textarea, select, [role="button"] {
   letter-spacing: -3px;
   line-height: 1;
   color: var(--text);
+  text-shadow: 0 0 20px rgba(74, 124, 247, 0.4);
 }
 
 .streak-unit {
@@ -1323,21 +1419,26 @@ a, button, input, textarea, select, [role="button"] {
 
 .streak-note {
   font-size: 12px;
-  color: var(--text-muted);
+  color: #6b6880;
   font-style: italic;
 }
 
 /* ── Ring ── */
-.stat-ring { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; border-bottom: 1px solid #1e1c2e; }
+.stat-ring { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; }
 
 .ring-wrap {
   position: relative;
   width: 110px;
   height: 110px;
-  margin: 6px auto 0;
+  margin: 6px 0 0;
 }
 
-.ring-svg { width: 100%; height: 100%; overflow: visible; }
+.ring-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 8px rgba(74, 124, 247, 0.5));
+}
 
 .ring-center {
   position: absolute;
@@ -1353,12 +1454,13 @@ a, button, input, textarea, select, [role="button"] {
   font-weight: 700;
   color: var(--text);
   letter-spacing: -1px;
+  text-shadow: 0 0 20px rgba(74, 124, 247, 0.4);
 }
 
 .ring-pct { font-size: 14px; font-weight: 700; }
 
 /* ── Mood ── */
-.stat-mood { grid-column: 1; grid-row: 2; border-right: 1px solid #1e1c2e; }
+.stat-mood { grid-column: 1; grid-row: 2; }
 
 .mood-word {
   font-family: 'Playfair Display', Georgia, serif;
@@ -1399,7 +1501,7 @@ a, button, input, textarea, select, [role="button"] {
   display: flex;
   justify-content: space-between;
   font-size: 10px;
-  color: var(--text-muted);
+  color: #6b6880;
   margin-top: 8px;
 }
 
@@ -1416,9 +1518,10 @@ a, button, input, textarea, select, [role="button"] {
   letter-spacing: -2.5px;
   line-height: 1;
   color: var(--text);
+  text-shadow: 0 0 20px rgba(74, 124, 247, 0.4);
 }
 
-.count-note { font-size: 12px; color: var(--text-muted); font-style: italic; }
+.count-note { font-size: 12px; color: #6b6880; font-style: italic; }
 
 /* ── Chart cards ── */
 .chart-card {
@@ -1436,7 +1539,9 @@ a, button, input, textarea, select, [role="button"] {
   align-items: center;
   gap: 8px;
   margin-bottom: 20px;
-  color: var(--text-muted);
+  color: #8b88a8;
+  /* allow legend to push to the right */
+  width: 100%;
 }
 
 .chart-header h3 {
@@ -1468,8 +1573,9 @@ a, button, input, textarea, select, [role="button"] {
   gap: 16px;
   margin-top: 14px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: #6b6880;
   align-items: center;
+  margin-left: auto;
 }
 
 .legend-item { display: flex; align-items: center; gap: 6px; }
@@ -3289,8 +3395,8 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 .arc-icon--sunrise {
-  color: #f59e0b;
-  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.7)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
+  color: var(--gold);
+  filter: drop-shadow(0 0 5px rgba(212, 168, 83, 0.7)) drop-shadow(0 0 10px rgba(212, 168, 83, 0.4));
   opacity: 0.9;
 }
 
@@ -3784,42 +3890,44 @@ a, button, input, textarea, select, [role="button"] {
   font-size: 10px;
 }
 
-/* ── Mood glyphs — emotional spectrum, replaces slider ── */
+/* ── Mood glyphs — label above icon, icon above line with tick marks ── */
 .mood-glyphs-wrap {
-  margin-bottom: 20px;
-}
-
-.mood-glyph-active-label {
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-100%);
-  font-family: 'DM Mono', 'Courier New', monospace;
-  font-size: 9px;
-  color: #d4a853;
-  white-space: nowrap;
-  pointer-events: none;
-  letter-spacing: 0.04em;
-}
-
-.mood-glyphs-row {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 0;
+  margin-top: 12px;
+  margin-bottom: 16px;
 }
 
-/* visible 1px ruled line — the scale lives on this line */
-.mood-glyphs-line {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
+/* Icons row — label zone reserved above via padding */
+.mood-glyphs-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  width: calc(100% - 10px);
+  padding-top: 22px; /* space for label above each icon */
+  margin-bottom: 5px;
+}
+
+/* Rail: comes after the row in flow */
+.mood-glyphs-rail {
+  position: relative;
   height: 1px;
   background: #2e2c42;
+  margin-right: 10px;
+  margin-top: 0;
   pointer-events: none;
+}
+
+/* Arrowhead at the right end */
+.mood-glyphs-rail::after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: -3px;
+  width: 0;
+  height: 0;
+  border-top: 3.5px solid transparent;
+  border-bottom: 3.5px solid transparent;
+  border-left: 7px solid #2e2c42;
 }
 
 .mood-glyph-btn {
@@ -3827,11 +3935,10 @@ a, button, input, textarea, select, [role="button"] {
   z-index: 1;
   background: none;
   border: none;
-  padding: 20px 4px 8px;
+  padding: 0 4px;
   color: #4a4560;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: visible;
@@ -3841,15 +3948,49 @@ a, button, input, textarea, select, [role="button"] {
     filter 0.18s ease;
 }
 
+/* Tick mark on the rail below each icon */
+.mood-glyph-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  height: 5px;
+  background: #3a3858;
+  pointer-events: none;
+}
+
+/* Selected tick brightens */
+.mood-glyph-btn.selected::after {
+  background: var(--gold);
+  height: 6px;
+  bottom: -6px;
+}
+
 .mood-glyph-btn:hover {
   color: rgba(184, 180, 204, 0.72);
-  transform: scale(1.2) translateY(-2px);
+  transform: scale(1.15);
 }
 
 .mood-glyph-btn.selected {
   color: var(--gold);
-  transform: scale(1.28) translateY(-2px);
+  transform: scale(1.22);
   filter: drop-shadow(0 0 5px rgba(212, 168, 83, 0.4));
+}
+
+/* Label sits above the icon, centered */
+.mood-glyph-active-label {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', 'Courier New', monospace;
+  font-size: 9px;
+  color: #d4a853;
+  white-space: nowrap;
+  pointer-events: none;
+  letter-spacing: 0.04em;
 }
 
 /* ── Ruled-line inputs — bottom border only ── */

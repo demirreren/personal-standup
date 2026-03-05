@@ -860,9 +860,7 @@ function MoodGlyphs({
 
   return (
     <div className="mood-glyphs-wrap">
-      {/* Arrow rail — sits above the icons */}
-      <div className="mood-glyphs-rail" aria-hidden="true" />
-      {/* Icons hang below the rail */}
+      {/* Icons sit above the rail */}
       <div className="mood-glyphs-row">
         {MOOD_GLYPHS.map((g) => (
           <button
@@ -879,6 +877,8 @@ function MoodGlyphs({
           </button>
         ))}
       </div>
+      {/* Arrow rail — renders after icons in flow */}
+      <div className="mood-glyphs-rail" aria-hidden="true" />
     </div>
   );
 }
