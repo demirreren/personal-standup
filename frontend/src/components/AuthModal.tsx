@@ -50,8 +50,8 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
       }
       reset();
       onClose();
-    } catch (err: any) {
-      setError(err.message || (mode === "login" ? "Invalid credentials" : "Registration failed"));
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : (mode === "login" ? "Invalid credentials" : "Registration failed"));
     } finally {
       setLoading(false);
     }
@@ -66,8 +66,6 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
     reset();
     onClose();
   };
-
-  const fieldOffset = mode === "register" ? 0 : 0;
 
   return (
     <motion.div
@@ -135,7 +133,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
           {mode === "register" && (
             <motion.div
               className="input-wrapper"
-              custom={fieldOffset}
+              custom={0}
               variants={fieldVariants}
               initial="hidden"
               animate="visible"

@@ -1,15 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { api, type Checkin } from "../lib/api";
+import { getFeelingLabel } from "../lib/feelings";
 import { Sun, Moon } from "lucide-react";
-
-function getFeelingLabel(value: number): string {
-  if (value <= 15) return "Drained";
-  if (value <= 35) return "Low";
-  if (value <= 55) return "Okay";
-  if (value <= 75) return "Good";
-  if (value <= 90) return "Great";
-  return "Energized";
-}
 
 
 function getAvgFeeling(checkins: Checkin[]): number | null {
@@ -19,8 +11,8 @@ function getAvgFeeling(checkins: Checkin[]): number | null {
 }
 
 function getMoodSummary(value: number): { label: string } {
-  if (value <= 35) return { label: "Low" };
-  if (value <= 65) return { label: "Mid" };
+  if (value <= 3) return { label: "Low" };
+  if (value <= 6) return { label: "Mid" };
   return { label: "High" };
 }
 

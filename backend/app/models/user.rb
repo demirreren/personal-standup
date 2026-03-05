@@ -7,7 +7,8 @@ class User < ApplicationRecord
 
   validates :email, presence: true, uniqueness: true,
             format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :name, presence: true
+  validates :name, presence: true, length: { maximum: 100 }
+  validates :password, length: { minimum: 6 }, if: -> { password.present? }
 
   before_create :generate_share_token
 

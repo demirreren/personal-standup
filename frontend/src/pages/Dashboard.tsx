@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { api, type DashboardStats, type TrendDay } from "../lib/api";
+import { getFeelingLabel, getFeelingColor, formatShortDate } from "../lib/feelings";
 import { Flame, Calendar, TrendingUp, Heart } from "lucide-react";
 import {
   AreaChart,
@@ -9,20 +10,6 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-
-function getFeelingLabel(value: number): string {
-  if (value <= 2) return "Drained";
-  if (value <= 4) return "Low";
-  if (value <= 6) return "Okay";
-  if (value <= 8) return "Good";
-  if (value === 9) return "Great";
-  return "Energized";
-}
-
-function getFeelingColor(value: number): string {
-  const hue = Math.round(((value - 1) / 9) * 120);
-  return `hsl(${hue}, 52%, 52%)`;
-}
 
 export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -243,9 +230,4 @@ function CountCard({ value }: { value: number }) {
   );
 }
 
-function formatShort(dateStr: string) {
-  return new Date(dateStr + "T12:00:00").toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-}
+const formatShort = formatShortDate;

@@ -59,13 +59,18 @@ module Api
       private
 
       def calculate_streak(checkins, from_date)
-        streak = 0
-        date = from_date
+        dates_with_checkins = checkins
+          .where(date: (from_date - 365.days)..from_date)
+          .distinct.pluck(:date)
+          .sort
+          .reverse
 
-        loop do
-          break unless checkins.for_date(date).exists?
+        streak = 0
+        expected = from_date
+        dates_with_checkins.each do |d|
+          break if d != expected
           streak += 1
-          date -= 1.day
+          expected -= 1.day
         end
 
         streak

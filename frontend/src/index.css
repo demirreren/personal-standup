@@ -4158,16 +4158,184 @@ a, button, input, textarea, select, [role="button"] {
 }
 
 /* ============ RESPONSIVE ============ */
+
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main-content { margin-left: 0; padding: 24px 18px; }
-  .hero { padding: 80px 24px 60px; }
-  .hero-title { font-size: 36px; }
-  .hero-subtitle { font-size: 15px; }
-  .bento-grid { grid-template-columns: 1fr; }
-  .stats-bento { grid-template-columns: 1fr; }
-  .stat-streak, .stat-ring, .stat-mood, .stat-count { grid-column: 1; grid-row: auto; }
-  .cta-section h2 { font-size: 28px; }
-  .welcome-greeting { font-size: 36px; letter-spacing: -1px; }
+  /* ── Sidebar → bottom nav ── */
+  .sidebar {
+    width: 100% !important;
+    height: 60px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 8px;
+    border-right: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 100;
+    overflow: visible;
+  }
+
+  .sidebar-header { display: none; }
+  .sidebar-footer { display: none; }
+
+  .nav-links {
+    flex-direction: row;
+    gap: 0;
+    width: 100%;
+    justify-content: space-around;
+    padding: 0;
+  }
+
+  .nav-link {
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+
+  .nav-link span {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+    font-size: 10px;
+  }
+
+  .nav-link svg { width: 18px; height: 18px; }
+
+  /* ── Main content ── */
+  .main-content {
+    margin-left: 0 !important;
+    padding: 20px 16px 80px !important;
+  }
+
+  .main-content-wide { padding: 20px 8px 80px !important; }
+
+  /* ── Welcome / signed-out ── */
+  .welcome-screen { padding: 0 16px; }
+  .welcome-greeting { font-size: 32px !important; letter-spacing: -1px; }
   .welcome-hint { font-size: 14px; }
+  .welcome-card-peek { display: none; }
+
+  /* ── Today page ── */
+  .today-greeting-header { padding: 0; }
+  .today-greeting-text { font-size: 22px; }
+  .date-label { font-size: 12px; }
+
+  /* ── Day arc ── */
+  .day-arc { margin: 12px 0 16px; }
+
+  /* ── Flip cards → stack vertically ── */
+  .standup-flip-cards {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .standup-flip-card {
+    min-height: 320px;
+  }
+
+  .standup-stage { padding: 0; }
+  .standup-stage::before,
+  .standup-stage::after { display: none; }
+
+  /* ── Dashboard ── */
+  .stats-bento {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card { padding: 16px; }
+  .stat-streak, .stat-ring, .stat-mood, .stat-count {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .chart-card { padding: 16px; }
+
+  .heatmap { gap: 3px; }
+
+  /* ── History ── */
+  .history-card {
+    min-width: 240px;
+    padding: 16px;
+  }
+
+  .history-header { padding: 0 8px; }
+  .history-title { font-size: 22px; }
+
+  /* ── Weekly ── */
+  .weekly-bounce-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Landing ── */
+  .hero { padding: 80px 20px 60px; }
+  .hero-title { font-size: 32px; }
+  .hero-subtitle { font-size: 14px; }
+  .bento-grid { grid-template-columns: 1fr; }
+  .cta-section h2 { font-size: 24px; }
+  .checkin-preview-cards { flex-direction: column; align-items: center; gap: 20px; }
+
+  /* ── Auth modal ── */
+  .modal-content {
+    width: 92vw !important;
+    max-width: none;
+    margin: 0 auto;
+  }
+
+  /* ── Shared digest ── */
+  .shared-card {
+    margin: 20px 12px;
+    padding: 28px 20px;
+  }
+
+  /* ── Misc ── */
+  .blob-cursor { display: none; }
+  .page-header h2 { font-size: 22px; }
+}
+
+@media (max-width: 400px) {
+  .stats-bento { grid-template-columns: 1fr; }
+  .standup-flip-card { min-height: 280px; }
+  .today-greeting-text { font-size: 18px; }
+  .mood-glyphs-row { gap: 4px; }
+}
+
+/* ── Error boundary ── */
+.error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 24px;
+}
+
+.error-boundary-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+}
+
+.error-boundary-card h3 {
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.error-boundary-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.error-boundary-card .btn-primary {
+  font-size: 13px;
+  padding: 10px 24px;
 }

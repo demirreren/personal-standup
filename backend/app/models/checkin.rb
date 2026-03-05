@@ -5,12 +5,18 @@ class Checkin < ApplicationRecord
 
   validates :checkin_type, presence: true
   validates :date, presence: true
-  validates :feeling, inclusion: { in: 0..100 }, allow_nil: true
+  validates :feeling, inclusion: { in: 0..10 }, allow_nil: true
   validates :checkin_type, uniqueness: { scope: [ :user_id, :date ],
     message: "already exists for this date" }
 
   validates :today_plan, presence: true, if: :morning?
   validates :what_happened, presence: true, if: :evening?
+
+  validates :today_plan, length: { maximum: 2000 }, allow_nil: true
+  validates :yesterday, length: { maximum: 2000 }, allow_nil: true
+  validates :blockers, length: { maximum: 2000 }, allow_nil: true
+  validates :what_happened, length: { maximum: 2000 }, allow_nil: true
+  validates :carry_over, length: { maximum: 2000 }, allow_nil: true
 
   scope :for_date, ->(date) { where(date: date) }
   scope :for_range, ->(start_date, end_date) { where(date: start_date..end_date) }

@@ -5,28 +5,11 @@ import { useAuth } from "../context/AuthContext";
 import AuthModal from "../components/AuthModal";
 import SplitText from "../components/SplitText";
 import { api, type Checkin } from "../lib/api";
+import { getFeelingLabel, getFeelingColor, formatTime } from "../lib/feelings";
 import { ArrowRight, Check, Send } from "lucide-react";
 import TiltedCard from "../components/TiltedCard";
 
 const LAYOUT_SPRING = { type: "spring" as const, stiffness: 75, damping: 18, mass: 1.1 };
-
-function getFeelingLabel(value: number): string {
-  if (value <= 2) return "Drained";
-  if (value <= 4) return "Low";
-  if (value <= 6) return "Okay";
-  if (value <= 8) return "Good";
-  if (value === 9) return "Great";
-  return "Energized";
-}
-
-function getFeelingColor(value: number): string {
-  const hue = Math.round(((value - 1) / 9) * 120);
-  return `hsl(${hue}, 52%, 52%)`;
-}
-
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-}
 
 function getSignedOutGreeting() {
   const h = new Date().getHours();
