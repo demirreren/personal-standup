@@ -71,4 +71,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the Rails server
 EXPOSE 3000
-CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+CMD ["sh", "-c", "exec ./bin/rails server -b 0.0.0.0 -p ${PORT:-3000}"]
