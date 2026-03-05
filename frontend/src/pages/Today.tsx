@@ -708,22 +708,6 @@ function SunriseIcon({ size = 13 }: { size?: number }) {
   );
 }
 
-function SunIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="8" cy="8" r="2.8" stroke="currentColor" strokeWidth="1.2" />
-      <line x1="8" y1="1.5" x2="8" y2="3.2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="8" y1="12.8" x2="8" y2="14.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="1.5" y1="8" x2="3.2" y2="8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="12.8" y1="8" x2="14.5" y2="8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="3.5" y1="3.5" x2="4.7" y2="4.7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="11.3" y1="11.3" x2="12.5" y2="12.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="12.5" y1="3.5" x2="11.3" y2="4.7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <line x1="4.7" y1="11.3" x2="3.5" y2="12.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function MoonIcon({ size = 13 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

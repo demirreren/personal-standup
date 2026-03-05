@@ -77,7 +77,7 @@ export default function Dashboard() {
                 }}
                 labelStyle={{ color: "#8b88a8", marginBottom: 4 }}
                 itemStyle={{ color: "#4a7cf7" }}
-                formatter={(v: number) => [`${v}/10 — ${getFeelingLabel(v)}`, ""]}
+                formatter={(v: number | undefined) => v != null ? [`${v}/10 — ${getFeelingLabel(v)}`, ""] : ["", ""]}
               />
               <Area
                 type="monotone"

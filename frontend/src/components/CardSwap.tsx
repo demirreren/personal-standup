@@ -88,7 +88,7 @@ export default function CardSwap({
 
       const backSlot = makeSlot(refs.length - 1, cardDistance, verticalDistance, refs.length);
       tl.addLabel("return", `promote+=${dur * 0.05}`);
-      tl.call(() => gsap.set(elFront, { zIndex: backSlot.zIndex }), undefined, "return");
+      tl.call(() => { gsap.set(elFront, { zIndex: backSlot.zIndex }); }, undefined, "return");
       tl.to(elFront, { x: backSlot.x, y: backSlot.y, z: backSlot.z, duration: dur, ease }, "return");
       tl.call(() => { order.current = [...rest, front]; });
     };

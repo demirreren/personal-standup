@@ -1,5 +1,5 @@
 class JwtService
-  SECRET = Rails.application.credentials.secret_key_base || ENV.fetch("JWT_SECRET", "dev-secret-key")
+  SECRET = ENV.fetch("JWT_SECRET") { Rails.application.credentials.secret_key_base || "dev-secret-key" }
   EXPIRY = 7.days
 
   def self.encode(user_id)
